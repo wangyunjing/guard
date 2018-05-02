@@ -11,10 +11,7 @@ public class ApplicationInfo implements ApplicationConfig{
     private static final Integer DEFAULT_MIN_TIME = 3000;
 
     // 监控服务器可用的周期
-    private static final Integer DEFAULT_MONITOR_SERVER_AVAILABLE_DURATION = 20000;
-
-    // 监控实例个数的周期
-    private static final Integer DEFAULT_MONITORING_INSTANCE_NUM_DURATION = 20000;
+    private static final Integer DEFAULT_DEFEND_INSTANCE_DURATION = 20000;
 
     // 应用Id
     private Integer applicationId;
@@ -40,11 +37,7 @@ public class ApplicationInfo implements ApplicationConfig{
     // 默认远程服务器的密码
     private String password;
 
-    // 监控服务器可用的周期
-    private Integer monitorServerAvailableDuration;
-
-    // 监控实例个数的周期
-    private Integer monitoringInstanceNumDuration;
+    private Integer defendInstanceDuration;
 
     // 默认心跳检查频率(毫秒)
     private Integer heartbeatRate;
@@ -77,11 +70,8 @@ public class ApplicationInfo implements ApplicationConfig{
             if (this.applicationInfo.startInstanceNum < 0) {
                 this.applicationInfo.startInstanceNum = 0;
             }
-            if (isSetDefaultValue(applicationInfo.getMonitorServerAvailableDuration())) {
-                this.applicationInfo.monitorServerAvailableDuration = ApplicationInfo.DEFAULT_MONITOR_SERVER_AVAILABLE_DURATION;
-            }
-            if (isSetDefaultValue(applicationInfo.getMonitoringInstanceNumDuration())) {
-                this.applicationInfo.monitoringInstanceNumDuration = ApplicationInfo.DEFAULT_MONITORING_INSTANCE_NUM_DURATION;
+            if (isSetDefaultValue(applicationInfo.getDefendInstanceDuration())) {
+                this.applicationInfo.defendInstanceDuration = ApplicationInfo.DEFAULT_DEFEND_INSTANCE_DURATION;
             }
             return this.applicationInfo;
         }
@@ -126,13 +116,8 @@ public class ApplicationInfo implements ApplicationConfig{
             return this;
         }
 
-        public Builder setMonitorServerAvailableDuration(Integer monitorServerAvailableDuration) {
-            this.applicationInfo.monitorServerAvailableDuration = monitorServerAvailableDuration;
-            return this;
-        }
-
-        public Builder setMonitoringInstanceNumDuration(Integer monitoringInstanceNumDuration) {
-            this.applicationInfo.monitoringInstanceNumDuration = monitoringInstanceNumDuration;
+        public Builder setDefendInstanceDuration(Integer defendInstanceDuration) {
+            this.applicationInfo.defendInstanceDuration = defendInstanceDuration;
             return this;
         }
 
@@ -205,13 +190,8 @@ public class ApplicationInfo implements ApplicationConfig{
     }
 
     @Override
-    public Integer getMonitorServerAvailableDuration() {
-        return monitorServerAvailableDuration;
-    }
-
-    @Override
-    public Integer getMonitoringInstanceNumDuration() {
-        return monitoringInstanceNumDuration;
+    public Integer getDefendInstanceDuration() {
+        return defendInstanceDuration;
     }
 
     @Override

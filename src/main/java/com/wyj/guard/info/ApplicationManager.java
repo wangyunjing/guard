@@ -20,16 +20,12 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 
 public class ApplicationManager implements Closeable, ApplicationListener<ApplicationEvent> {
 
     private Logger logger = LoggerFactory.getLogger(ApplicationManager.class);
-
-    private Lock lock = new ReentrantLock();
 
     // 上下文
     protected ConfigurableGuardContext context;
@@ -98,25 +94,24 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
             startedInstances.clear();
             notStartedInstances.clear();
             // 获取已经启动的实例
-            instanceManagerList
-                    .forEach(instanceManager -> {
-                        InstanceInfo instanceInfo = instanceManager.getInstanceInfo();
-                        // 不允许启动的实例
-                        if (instanceInfo.getStatus().equals(LaunchStatus.SHUTDOWN)) {
-                            // 放入未启动实例列表中
-                            notStartedInstances.add(instanceInfo.getInstanceId());
-                            return;
-                        }
-                        // 初始化已启动的实例
-                        InstanceStatus instanceStatus = instanceManager.getInstanceStatus();
-                        if (instanceStatus == InstanceStatus.UP ||
-                                instanceStatus == InstanceStatus.DOWN) {
-                            startedInstances.add(instanceManager.getInstanceInfo().getInstanceId());
-                            return;
-                        }
-                        // 放入未启动实例列表中
-                        notStartedInstances.add(instanceInfo.getInstanceId());
-                    });
+            instanceManagerList.forEach(instanceManager -> {
+                InstanceInfo instanceInfo = instanceManager.getInstanceInfo();
+                // 不允许启动的实例
+                if (instanceInfo.getStatus().equals(LaunchStatus.SHUTDOWN)) {
+                    // 放入未启动实例列表中
+                    notStartedInstances.add(instanceInfo.getInstanceId());
+                    return;
+                }
+                // 初始化已启动的实例
+                InstanceStatus instanceStatus = instanceManager.getInstanceStatus();
+                if (instanceStatus == InstanceStatus.UP ||
+                        instanceStatus == InstanceStatus.DOWN) {
+                    startedInstances.add(instanceManager.getInstanceInfo().getInstanceId());
+                    return;
+                }
+                // 放入未启动实例列表中
+                notStartedInstances.add(instanceInfo.getInstanceId());
+            });
             virtualClosed = false;
             physicalClosed = false;
             // 启动监控
@@ -305,7 +300,7 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
                         return;
                     }
                     long delay = DateTimeUtils.delayTime(startTime +
-                            getApplicationInfo().getMonitorServerAvailableDuration());
+                            getApplicationInfo().getDefendInstanceDuration());
                     scheduled.schedule(this, delay, TimeUnit.MILLISECONDS);
                 }
             }, taskExecutor);

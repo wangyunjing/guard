@@ -22,11 +22,8 @@ public interface ConfigurableApplicationConfig extends ApplicationConfig {
     // 设置远程服务器密码
     void setDefaultPassword(String password);
 
-    // 设置监控服务器可用的周期（毫秒）
-    void setMonitorServerAvailableDuration(Integer duration);
-
-    // 设置监控实例个数的周期(毫秒)
-    void setMonitoringInstanceNumDuration(Integer duration);
+    // 设置维护实例列表的周期
+    void setDefendInstanceDuration(Integer duration);
 
     // 设置默认心跳检查频率(毫秒)
     void setDefaultHeartbeatRate(Integer rate);

@@ -146,32 +146,14 @@ public class DBApplicationConfig extends AbstractApplicationConfig {
     }
 
     @Override
-    public void setMonitorServerAvailableDuration(Integer duration) {
-        String sql = StringPlaceholderResolver.resolvePlaceholder(DEFAULT_UPDATE_PLACEHOLDER_SQL, "monitor_server_available_duration");
+    public void setDefendInstanceDuration(Integer duration) {
+        String sql = StringPlaceholderResolver.resolvePlaceholder(DEFAULT_UPDATE_PLACEHOLDER_SQL, "defend_instance_duration");
         jdbcTemplate.update(sql, duration, applicationId);
     }
 
     @Override
-    public void setMonitoringInstanceNumDuration(Integer duration) {
-        String sql = StringPlaceholderResolver.resolvePlaceholder(DEFAULT_UPDATE_PLACEHOLDER_SQL, "monitoring_instance_num_duration");
-        jdbcTemplate.update(sql, duration, applicationId);
-    }
-
-    @Override
-    public Integer getMonitorServerAvailableDuration() {
-        String sql = StringPlaceholderResolver.resolvePlaceholder(DEFAULT_QUERY_PLACEHOLDER_SQL, "monitor_server_available_duration");
-
-        return jdbcTemplate.query(sql, new Object[]{applicationId}, (resultSet) -> {
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-            return null;
-        });
-    }
-
-    @Override
-    public Integer getMonitoringInstanceNumDuration() {
-        String sql = StringPlaceholderResolver.resolvePlaceholder(DEFAULT_QUERY_PLACEHOLDER_SQL, "monitoring_instance_num_duration");
+    public Integer getDefendInstanceDuration() {
+        String sql = StringPlaceholderResolver.resolvePlaceholder(DEFAULT_QUERY_PLACEHOLDER_SQL, "defend_instance_duration");
 
         return jdbcTemplate.query(sql, new Object[]{applicationId}, (resultSet) -> {
             if (resultSet.next()) {

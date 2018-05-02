@@ -28,11 +28,8 @@ public interface ApplicationConfig {
     // 默认远程服务器密码
     String getDefaultPassword();
 
-    // 监控服务器可用的周期（毫秒）
-    Integer getMonitorServerAvailableDuration();
-
-    // 监控实例个数的周期(毫秒)
-    Integer getMonitoringInstanceNumDuration();
+    // 维护实例列表的周期(毫秒)
+    Integer getDefendInstanceDuration();
 
     // 默认心跳检查频率(毫秒)
     Integer getDefaultHeartbeatRate();
