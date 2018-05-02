@@ -7,6 +7,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.wyj.guard.info.InstanceInfo;
 import com.wyj.guard.share.enums.InstanceStatus;
+import com.wyj.guard.share.enums.ServerStatus;
 import com.wyj.guard.utils.StringPlaceholderResolver;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -123,6 +124,20 @@ public class JSCHClient implements SSHClient {
             return InstanceStatus.DOWN;
         }
         return InstanceStatus.UP;
+    }
+
+    @Override
+    public ServerStatus getServerStatus(InstanceInfo instanceInfo) {
+        boolean exec = commandExec(instanceInfo, openChannel ->
+                        openChannel.setCommand(DEFAULT_COMMAND), "");
+        ServerStatus serverStatus;
+        if (exec) {
+            serverStatus = ServerStatus.AVAILABLE;
+        } else {
+            serverStatus = ServerStatus.UNAVAILABLE;
+        }
+        logger.info("服务器{}的状态为{}", instanceInfo.getInstanceId(), serverStatus);
+        return serverStatus;
     }
 
     // 执行命令

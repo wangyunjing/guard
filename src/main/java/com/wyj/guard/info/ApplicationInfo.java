@@ -74,6 +74,9 @@ public class ApplicationInfo implements ApplicationConfig{
         }
 
         public ApplicationInfo build() {
+            if (this.applicationInfo.startInstanceNum < 0) {
+                this.applicationInfo.startInstanceNum = 0;
+            }
             if (isSetDefaultValue(applicationInfo.getMonitorServerAvailableDuration())) {
                 this.applicationInfo.monitorServerAvailableDuration = ApplicationInfo.DEFAULT_MONITOR_SERVER_AVAILABLE_DURATION;
             }
