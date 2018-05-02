@@ -10,7 +10,6 @@ import com.wyj.guard.info.loader.InstanceConfigLoader;
 import com.wyj.guard.remote.SSHClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.function.Function;
@@ -23,7 +22,7 @@ public class DefaultGuardContext extends AbstractGuardContext {
 
     private GuardProperties guardProperties;
 
-    private RedisTemplate redisTemplate;
+//    private RedisTemplate redisTemplate;
 
     private SSHClient sshClient;
 
@@ -59,11 +58,11 @@ public class DefaultGuardContext extends AbstractGuardContext {
         return this.guardProperties;
     }
 
-    @Override
-    public void setRedisTemplate(RedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
-
+//    @Override
+//    public void setRedisTemplate(RedisTemplate redisTemplate) {
+//        this.redisTemplate = redisTemplate;
+//    }
+//
 
 
 //    @Override

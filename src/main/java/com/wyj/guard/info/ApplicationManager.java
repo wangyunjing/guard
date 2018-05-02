@@ -212,11 +212,15 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
 
     // 维护实例列表
     private void defendInstances() {
+        logger.info("{} 应用维护实例列表。。。", getApplicationInfo().getApplicationName());
         if (virtualClosed || physicalClosed) {
+            logger.info("{} 应用维护实例列表成功，虚拟关闭:{}, 物理关闭:{}",
+                    getApplicationInfo().getApplicationName(), virtualClosed, physicalClosed);
             return;
         }
         defendStartedInstances();
         defendNotStartedInstances();
+        logger.info("{} 应用维护实例列表成功", getApplicationInfo().getApplicationName());
     }
 
     // 维护启动的实例列表
@@ -229,14 +233,18 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
             InstanceInfo instanceInfo = instanceManager.getInstanceInfo();
             // 移除不允许启动的实例
             if (instanceInfo.getStatus().equals(LaunchStatus.SHUTDOWN)) {
-                logger.info("实例{}不允许启动，移动到未启动实例列表", instanceId);
+                logger.info("应用：{}的实例{}不允许启动，移动到未启动实例列表",
+                        getApplicationInfo().getApplicationName(),
+                        instanceId);
                 iterator.remove();
                 notStartedInstances.add(instanceId);
                 continue;
             }
             // 移除已经物理关闭的实例
             if (instanceManager.isPhysicalClosed()) {
-                logger.info("实例{}已经关闭，移动到未启动实例列表", instanceId);
+                logger.info("应用：{}的实例{}已经关闭，移动到未启动实例列表",
+                        getApplicationInfo().getApplicationName(),
+                        instanceId);
                 iterator.remove();
                 notStartedInstances.add(instanceId);
                 continue;
@@ -250,6 +258,9 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
                 String instanceId = list.get(i);
                 InstanceManager instanceManager = instanceManagerMap.get(instanceId);
                 if (instanceManager.physicalClose()) {
+                    logger.info("应用：{}移除多余启动的实例{}，移动到未启动实例列表",
+                            getApplicationInfo().getApplicationName(),
+                            instanceId);
                     num--;
                     handleCloseSuccessful(instanceManager.getInstanceInfo());
                 }
@@ -269,17 +280,33 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
             // 关闭不允许启动的实例
             InstanceInfo instanceInfo = instanceManager.getInstanceInfo();
             if (instanceInfo.getStatus().equals(LaunchStatus.SHUTDOWN)) {
+                logger.info("应用：{}的实例{}不允许启动，关闭实例",
+                        getApplicationInfo().getApplicationName(),
+                        instanceId);
                 instanceManager.physicalClose();
                 continue;
             }
             if (num > 0) {
                 // 启动实例
+                logger.info("应用：{} 启动实例{}",
+                        getApplicationInfo().getApplicationName(),
+                        instanceId);
                 if (instanceManager.launch()) {
+                    logger.info("应用：{} 启动实例{}成功",
+                            getApplicationInfo().getApplicationName(),
+                            instanceId);
                     handleLaunchSuccessful(instanceInfo);
                     num--;
+                } else {
+                    logger.info("应用：{} 启动实例{}失败",
+                            getApplicationInfo().getApplicationName(),
+                            instanceId);
                 }
             } else {
                 // 关闭实例
+                logger.info("应用：{} 关闭实例{}",
+                        getApplicationInfo().getApplicationName(),
+                        instanceId);
                 instanceManager.physicalClose();
             }
         }

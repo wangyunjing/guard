@@ -9,7 +9,6 @@ import com.wyj.guard.info.config.InstanceConfig;
 import com.wyj.guard.info.loader.AppConfigLoader;
 import com.wyj.guard.info.loader.InstanceConfigLoader;
 import com.wyj.guard.remote.SSHClient;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.function.Function;
 
@@ -19,7 +18,7 @@ public interface ConfigurableGuardContext extends GuardContext {
 
     void setGuardProperties(GuardProperties guardProperties);
 
-    void setRedisTemplate(RedisTemplate redisTemplate);
+//    void setRedisTemplate(RedisTemplate redisTemplate);
 
     void setSSHClient(SSHClient sshClient);
 

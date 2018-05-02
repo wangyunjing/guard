@@ -2,7 +2,7 @@ package com.wyj.guard.db;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties("my.datasource")
+@ConfigurationProperties("guard.datasource")
 public class DataSourceProperties {
 
     private String url = "jdbc:mysql://localhost:3306/process_scheduling?useUnicode=true&characterEncoding=UTF8&useSSL=false";

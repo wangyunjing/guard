@@ -203,6 +203,7 @@ public class JSCHClient implements SSHClient {
         BufferedReader bufferedReader = null;
         ChannelExec execChannel = null;
         try {
+            execChannel = (ChannelExec) session.openChannel("exec");
             if (sshCommandExec != null) {
                 sshCommandExec.exec(execChannel);
             }
