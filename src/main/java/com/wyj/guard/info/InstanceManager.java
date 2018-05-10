@@ -15,6 +15,7 @@ import com.wyj.guard.share.enums.InstanceStatus;
 import com.wyj.guard.share.enums.LaunchStatus;
 import com.wyj.guard.share.enums.ServerStatus;
 import com.wyj.guard.utils.DateTimeUtils;
+import com.wyj.guard.utils.ThreadPoolUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class InstanceManager implements Closeable, ApplicationListener<Applicati
 
     private Logger logger = LoggerFactory.getLogger(InstanceManager.class);
 
-    private GuardContext context;
+    private ConfigurableGuardContext context;
 
     private ApplicationManager applicationManager;
 
@@ -125,6 +126,16 @@ public class InstanceManager implements Closeable, ApplicationListener<Applicati
     }
 
     @Override
+    public boolean selfClose() {
+        ThreadPoolUtils.shutdown(heartbeatScheduled);
+        ThreadPoolUtils.shutdown(taskExecutor);
+        heartbeatScheduled = null;
+        taskExecutor = null;
+        context.removeApplicationListener(this);
+        return true;
+    }
+
+    @Override
     public synchronized boolean virtualClose() {
         if (virtualClosed) {
             return virtualClosed;
@@ -151,8 +162,18 @@ public class InstanceManager implements Closeable, ApplicationListener<Applicati
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         if (event instanceof RefreshEvent) {
+            RefreshEvent refreshEvent = (RefreshEvent) event;
+            if (refreshEvent.getApplicationId() != null &&
+                    !applicationManager.getApplicationInfo().getApplicationId().equals(refreshEvent.getApplicationId())) {
+                return;
+            }
+            if (refreshEvent.getApplicationId() != null &&
+                    refreshEvent.getInstanceId() != null &&
+                    !getInstanceInfo().getInstanceId().equals(refreshEvent.getInstanceId())) {
+                return;
+            }
             logger.info("实例{}的配置更新！", getInstanceInfo().getInstanceId());
-            GuardContext context = (GuardContext) event.getSource();
+            GuardContext context = refreshEvent.getSource();
             InstanceInfo instanceInfo = context.getInstanceInfoSupplier().apply(getInstanceConfig());
             instancePairReference.set(Pair.newPair(getInstanceConfig(), instanceInfo));
         }
@@ -281,6 +302,8 @@ public class InstanceManager implements Closeable, ApplicationListener<Applicati
     public boolean isPhysicalClosed() {
         return physicalClosed;
     }
+
+
 }
 
 

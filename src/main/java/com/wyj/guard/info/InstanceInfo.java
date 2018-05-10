@@ -17,6 +17,9 @@ public class InstanceInfo implements InstanceConfig {
     // 默认自我保护周期(毫秒)
     private static final Integer DEFAULT_SELF_PROTECTED_DURATION = 60000;
 
+    // 应用ID
+    private Integer applicationId;
+
     // 所属应用名
     private String applicationName;
 
@@ -82,6 +85,11 @@ public class InstanceInfo implements InstanceConfig {
                 instanceInfo.selfProtectedDuration = InstanceInfo.DEFAULT_SELF_PROTECTED_DURATION;
             }
             return this.instanceInfo;
+        }
+
+        public Builder setApplicationId(Integer applicationId) {
+            this.instanceInfo.applicationId = applicationId;
+            return this;
         }
 
         public Builder setApplicationName(String applicationName) {
@@ -153,6 +161,11 @@ public class InstanceInfo implements InstanceConfig {
             }
             return false;
         }
+    }
+
+    @Override
+    public Integer getApplicationId() {
+        return applicationId;
     }
 
     public String getApplicationName() {

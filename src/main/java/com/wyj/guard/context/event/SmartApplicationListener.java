@@ -23,7 +23,7 @@ public final class SmartApplicationListener implements ApplicationListener<Appli
 
     public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
         Class type = getEventType();
-        return type.equals(eventType);
+        return type.isAssignableFrom(eventType);
     }
 
     public Class getEventType() {
@@ -32,7 +32,7 @@ public final class SmartApplicationListener implements ApplicationListener<Appli
             Class type = (Class) ((ParameterizedType) genericInterfaces[0]).getActualTypeArguments()[0];
             return type;
         } catch (Exception e) {
-            logger.warn("{}没有找到泛型的Class！默认返回ApplicationEvent.class",
+            logger.debug("{}没有找到泛型的Class！默认返回ApplicationEvent.class",
                     applicationListener.getClass());
         }
         return ApplicationEvent.class;

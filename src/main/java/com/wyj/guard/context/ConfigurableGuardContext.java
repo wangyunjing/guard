@@ -32,6 +32,8 @@ public interface ConfigurableGuardContext extends GuardContext {
 
     void addApplicationListener(ApplicationListener<?> listener);
 
+    void removeApplicationListener(ApplicationListener<?> listener);
+
 //    void addRefreshableConfig(Refreshable refreshableConfig);
 //
 //    void addRefreshableConfigs(Refreshable[] refreshableConfigs);

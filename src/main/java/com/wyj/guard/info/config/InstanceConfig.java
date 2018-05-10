@@ -7,6 +7,9 @@ import com.wyj.guard.share.enums.LaunchStatus;
  */
 public interface InstanceConfig {
 
+    // 获取应用ID
+    Integer getApplicationId();
+
     // 获取应用名
     String getApplicationName();
 

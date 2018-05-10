@@ -13,6 +13,7 @@ public class InstanceInfoSupplier implements Function<InstanceConfig, InstanceIn
     @Override
     public InstanceInfo apply(InstanceConfig instanceConfig) {
         InstanceInfo instanceInfo = InstanceInfo.Builder.newBuilder()
+                .setApplicationId(instanceConfig.getApplicationId())
                 .setApplicationName(instanceConfig.getApplicationName())
                 .setInstanceId(instanceConfig.getInstanceId())
                 .setIp(instanceConfig.getIp())

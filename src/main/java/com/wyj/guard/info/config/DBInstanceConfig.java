@@ -31,6 +31,11 @@ public class DBInstanceConfig extends AbstractInstanceConfig {
     }
 
     @Override
+    public Integer getApplicationId() {
+        return applicationConfig.getApplicationId();
+    }
+
+    @Override
     public String getApplicationName() {
         return applicationConfig.getApplicationName();
     }
@@ -273,6 +278,10 @@ public class DBInstanceConfig extends AbstractInstanceConfig {
 
     @Override
     public LaunchStatus getStatus() {
+        LaunchStatus applicationConfigStatus = applicationConfig.getStatus();
+        if (applicationConfigStatus.equals(LaunchStatus.SHUTDOWN)) {
+            return LaunchStatus.SHUTDOWN;
+        }
         String sql = StringPlaceholderResolver.resolvePlaceholder(DEFAULT_QUERY_PLACEHOLDER_SQL, "status");
 
         Short status = jdbcTemplate.query(sql, args, (resultSet) -> {
@@ -281,6 +290,7 @@ public class DBInstanceConfig extends AbstractInstanceConfig {
             }
             return null;
         });
+
         return LaunchStatus.getEnum(status);
     }
 }

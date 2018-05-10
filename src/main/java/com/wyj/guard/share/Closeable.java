@@ -6,4 +6,6 @@ public interface Closeable {
 
     boolean physicalClose();
 
+    boolean selfClose();
+
 }

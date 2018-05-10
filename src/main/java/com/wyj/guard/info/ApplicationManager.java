@@ -14,6 +14,9 @@ import com.wyj.guard.share.Pair;
 import com.wyj.guard.share.enums.InstanceStatus;
 import com.wyj.guard.share.enums.LaunchStatus;
 import com.wyj.guard.utils.DateTimeUtils;
+import com.wyj.guard.utils.ThreadPoolUtils;
+import com.wyj.guard.web.InstanceCondition;
+import com.wyj.guard.web.InstanceEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +26,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
-public class ApplicationManager implements Closeable, ApplicationListener<ApplicationEvent> {
+public class ApplicationManager implements Closeable,
+        ApplicationListener<ApplicationEvent>, InstanceEndpoint {
 
     private Logger logger = LoggerFactory.getLogger(ApplicationManager.class);
 
@@ -124,6 +128,17 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
     }
 
     @Override
+    public boolean selfClose() {
+        instanceManagerList.forEach(instanceManager -> instanceManager.selfClose());
+        ThreadPoolUtils.shutdown(scheduled);
+        ThreadPoolUtils.shutdown(taskExecutor);
+        scheduled = null;
+        taskExecutor = null;
+        context.removeApplicationListener(this);
+        return true;
+    }
+
+    @Override
     public boolean virtualClose() {
         return CompletableFuture.supplyAsync(() -> {
             logger.info("{} 应用虚拟关闭...", getApplicationInfo().getApplicationName());
@@ -149,6 +164,10 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
 
     @Override
     public boolean physicalClose() {
+        return asyncPhysicalClose().join();
+    }
+
+    private CompletableFuture<Boolean> asyncPhysicalClose() {
         return CompletableFuture.supplyAsync(() -> {
             logger.info("{} 应用物理关闭...", getApplicationInfo().getApplicationName());
             for (InstanceManager instanceManager : instanceManagerList) {
@@ -168,7 +187,7 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
         }, taskExecutor).exceptionally(throwable -> {
             logger.warn("{} 应用物理关闭出错!", getApplicationInfo().getApplicationName(), throwable);
             return false;
-        }).join();
+        });
     }
 
     // 关闭成功的处理
@@ -194,8 +213,17 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         if (event instanceof RefreshEvent) {
+            RefreshEvent refreshEvent = (RefreshEvent) event;
+            if (refreshEvent.getApplicationId() != null &&
+                    !getApplicationInfo().getApplicationId().equals(refreshEvent.getApplicationId())) {
+                return;
+            }
+            if (refreshEvent.getApplicationId() != null &&
+                    refreshEvent.getInstanceId() != null) {
+                return;
+            }
             logger.info("{} 应用的配置更新！", getApplicationInfo().getApplicationName());
-            GuardContext guardContext = ((RefreshEvent) event).getSource();
+            GuardContext guardContext = refreshEvent.getSource();
             ApplicationInfo applicationInfo = guardContext.getApplicationInfoSupplier()
                     .apply(getApplicationConfig());
             applicationPairReference.set(Pair.newPair(getApplicationConfig(), applicationInfo));
@@ -240,8 +268,8 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
                 notStartedInstances.add(instanceId);
                 continue;
             }
-            // 移除已经物理关闭的实例
-            if (instanceManager.isPhysicalClosed()) {
+            // 移除已经关闭的实例
+            if (instanceManager.isPhysicalClosed() || instanceManager.isVirtualClosed()) {
                 logger.info("应用：{}的实例{}已经关闭，移动到未启动实例列表",
                         getApplicationInfo().getApplicationName(),
                         instanceId);
@@ -363,6 +391,73 @@ public class ApplicationManager implements Closeable, ApplicationListener<Applic
 
     public ApplicationInfo getApplicationInfo() {
         return applicationPairReference.get().getSecond();
+    }
+
+
+    // 动态添加实例
+    @Override
+    public boolean addInstance(InstanceConfig instanceConfig) {
+        CompletableFuture.runAsync(() -> {
+            InstanceManager instanceManager = new InstanceManager(context,
+                    this, instanceConfig);
+            instanceManagerMap.put(instanceManager.getInstanceInfo().getInstanceId(),
+                    instanceManager);
+            instanceManagerList.add(instanceManager);
+            notStartedInstances.add(instanceManager.getInstanceInfo().getInstanceId());
+            logger.debug("动态添加实例{}成功", instanceManager.getInstanceInfo().getInstanceId());
+        }, taskExecutor).join();
+        return true;
+    }
+
+    // 动态移除实例
+    @Override
+    public boolean removeInstance(Integer applicationId, String instanceId) {
+        if (!applicationId.equals(getApplicationInfo().getApplicationId())) {
+            logger.debug("不属于该应用! 该应用：{}，实际应用：{}", getApplicationInfo().getApplicationId(),
+                    applicationId);
+            return true;
+        }
+        return CompletableFuture.supplyAsync(() -> {
+            InstanceManager instanceManager = instanceManagerMap.get(instanceId);
+            if (instanceManager == null) {
+                logger.debug("移除应用{}中的实例{}，实例不存在", getApplicationInfo().getApplicationName(),
+                        instanceId);
+                return true;
+            }
+            if (instanceManager.physicalClose()) {
+                instanceManagerMap.remove(instanceId);
+                instanceManagerList.remove(instanceManager);
+                startedInstances.remove(instanceId);
+                notStartedInstances.remove(instanceId);
+                instanceManager.selfClose();
+                logger.debug("{} 动态移除实例{}成功", getApplicationInfo().getApplicationName(),
+                        instanceId);
+                return true;
+            }
+            logger.debug("{} 动态移除实例{}失败", getApplicationInfo().getApplicationName(),
+                    instanceId);
+            return false;
+        }, taskExecutor).join();
+    }
+
+    @Override
+    public InstanceInfo[] queryInstance(InstanceCondition condition) {
+        // TODO: 2018/5/11
+        return new InstanceInfo[0];
+    }
+
+    @Override
+    public InstanceInfo getInstance(Integer applicationId, String instanceId) {
+        if (!applicationId.equals(getApplicationInfo().getApplicationId())) {
+            logger.debug("不属于该应用! 该应用：{}，实际应用：{}", getApplicationInfo().getApplicationId(),
+                    applicationId);
+            return null;
+        }
+        Optional<InstanceInfo> optional = instanceManagerList.stream()
+                .map(instanceManager -> instanceManager.getInstanceInfo())
+                .filter(instanceInfo -> instanceInfo.getInstanceId().equals(instanceId))
+                .findFirst();
+        return optional.orElse(null);
     }
 }
 
