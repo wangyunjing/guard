@@ -31,15 +31,15 @@ public class InstanceController {
         return instanceEndpoint.queryInstance(condition);
     }
 
-    @GetMapping("/applications/{applicationId}/instances/{instanceId}")
-    public InstanceInfo getInstance(@RequestParam("applicationId") Integer applicationId,
+    @GetMapping("/applications/{applicationId}/instances")
+    public InstanceInfo getInstance(@PathVariable("applicationId") Integer applicationId,
                                     @RequestParam("instanceId") String instanceId) {
         return instanceEndpoint.getInstance(applicationId, instanceId);
     }
 
-    @PutMapping("/applications/{applicationId}/instances/{instanceId}")
+    @PutMapping("/applications/{applicationId}/instances")
     public void updateInstance(@PathVariable("applicationId") Integer applicationId,
-                                 @PathVariable("instanceId") String instanceId,
+                                 @RequestParam("instanceId") String instanceId,
                                  @RequestBody Instance instance) {
         instance.setApplicationId(applicationId);
         instance.setInstanceId(instanceId);
@@ -48,29 +48,42 @@ public class InstanceController {
     }
 
     @PostMapping("/applications/{applicationId}/instances")
-    public boolean addInstance(@PathVariable("applicationId") Integer applicaionId,
+    public boolean addInstance(@PathVariable("applicationId") Integer applicationId,
                               @RequestBody Instance instance) {
-        instance.setApplicationId(applicaionId);
+        instance.setApplicationId(applicationId);
         instance.setInstanceId(instance.getIp() + ":" + instance.getPort());
         InstanceConfig instanceConfig = context.getInstanceConfigLoader().addInstance(instance);
         return instanceEndpoint.addInstance(instanceConfig);
     }
 
-    @DeleteMapping("/applications/{applicationId}/instances/{instanceId}")
-    public boolean removeInstance(@PathVariable("applicationId") Integer applicaionId,
-                                 @PathVariable("instanceId") String instanceId) {
+    @DeleteMapping("/applications/{applicationId}/instances")
+    public boolean removeInstance(@PathVariable("applicationId") Integer applicationId,
+                                 @RequestParam("instanceId") String instanceId) {
         context.getInstanceConfigLoader().removeInstance(instanceId);
-        return instanceEndpoint.removeInstance(applicaionId, instanceId);
+        return instanceEndpoint.removeInstance(applicationId, instanceId);
     }
 
-    @PutMapping("/applications/{applicationId}/instances/{instanceId}/closure")
+    @PutMapping("/applications/{applicationId}/instances/closure")
     public void physicalCloseInstance(@PathVariable("applicationId") Integer applicationId,
-                                      @PathVariable("instanceId") String instanceId) {
+                                      @RequestParam("instanceId") String instanceId) {
         InstanceConfig instanceConfig = context.getInstanceConfigLoader().load(applicationId, instanceId);
         if (instanceConfig != null) {
             if (instanceConfig instanceof ConfigurableInstanceConfig) {
                 ConfigurableInstanceConfig configurableInstanceConfig = (ConfigurableInstanceConfig) instanceConfig;
                 configurableInstanceConfig.setStatus(LaunchStatus.SHUTDOWN);
+                managementEndpoint.refresh(applicationId, instanceId);
+            }
+        }
+    }
+
+    @PutMapping("/applications/{applicationId}/instances/open")
+    public void physicalOpenInstance(@PathVariable("applicationId") Integer applicationId,
+                                      @RequestParam("instanceId") String instanceId) {
+        InstanceConfig instanceConfig = context.getInstanceConfigLoader().load(applicationId, instanceId);
+        if (instanceConfig != null) {
+            if (instanceConfig instanceof ConfigurableInstanceConfig) {
+                ConfigurableInstanceConfig configurableInstanceConfig = (ConfigurableInstanceConfig) instanceConfig;
+                configurableInstanceConfig.setStatus(LaunchStatus.UP);
                 managementEndpoint.refresh(applicationId, instanceId);
             }
         }

@@ -30,5 +30,7 @@ public abstract class InstanceConfigLoader implements ConfigurationLoader<Instan
 
     public abstract boolean removeInstance(String instanceId);
 
+    public abstract boolean removeInstanceByApplication(Integer applicationId);
+
     public abstract boolean updateInstance(Instance instance);
 }

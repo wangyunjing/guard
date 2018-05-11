@@ -34,7 +34,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/applications/{applicationId}")
-    public ApplicationInfo getApplication(@RequestParam("applicationId") Integer applicationId) {
+    public ApplicationInfo getApplication(@PathVariable("applicationId") Integer applicationId) {
         return endpoint.getApplication(applicationId);
     }
 
@@ -45,8 +45,9 @@ public class ApplicationController {
     }
 
     @DeleteMapping("/applications/{applicationId}")
-    public boolean removeApplication(@RequestParam("applicationId") Integer applicationId) {
+    public boolean removeApplication(@PathVariable("applicationId") Integer applicationId) {
         context.getAppConfigLoader().removeApplication(applicationId);
+        context.getInstanceConfigLoader().removeInstanceByApplication(applicationId);
         return endpoint.removeApplication(applicationId);
     }
 
@@ -65,6 +66,18 @@ public class ApplicationController {
             if (applicationConfig instanceof ConfigurableApplicationContext) {
                 ConfigurableApplicationConfig configurableApplicationConfig = (ConfigurableApplicationConfig) applicationConfig;
                 configurableApplicationConfig.setStatus(LaunchStatus.SHUTDOWN);
+                managementEndpoint.refresh(applicationId, null);
+            }
+        }
+    }
+
+    @PutMapping("/applications/{applicationId}/open")
+    public void physicalOpenApplication(@PathVariable("applicationId") Integer applicationId) {
+        ApplicationConfig applicationConfig = context.getAppConfigLoader().load(applicationId);
+        if (applicationConfig != null) {
+            if (applicationConfig instanceof ConfigurableApplicationContext) {
+                ConfigurableApplicationConfig configurableApplicationConfig = (ConfigurableApplicationConfig) applicationConfig;
+                configurableApplicationConfig.setStatus(LaunchStatus.UP);
                 managementEndpoint.refresh(applicationId, null);
             }
         }

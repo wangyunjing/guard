@@ -54,17 +54,25 @@ public class SingleLauncher extends AbstractLauncher {
         return true;
     }
 
-    // 是否启动
-    @Override
-    public boolean isLaunched() {
-        return launched;
-    }
-
     @Override
     public void close() {
         logger.info("关闭所有实例...");
-        applicationManagers.forEach(applicationManager ->
-                applicationManager.physicalClose());
+        applicationManagers.forEach(applicationManager -> {
+            if (!applicationManager.isPhysicalClosed()) {
+                applicationManager.physicalClose();
+            }
+        });
+    }
+
+    @Override
+    public void open() {
+        logger.info("开启所有实例...");
+        applicationManagers.forEach(applicationManager -> {
+            if (applicationManager.isVirtualClosed() ||
+                    applicationManager.isPhysicalClosed()) {
+                applicationManager.launch();
+            }
+        });
     }
 
     @Override

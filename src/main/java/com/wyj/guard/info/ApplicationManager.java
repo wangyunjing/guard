@@ -41,13 +41,13 @@ public class ApplicationManager implements Closeable,
     private Map<String, InstanceManager> instanceManagerMap = new ConcurrentHashMap<>();
 
     // 所有的实例管理器
-    protected List<InstanceManager> instanceManagerList = new CopyOnWriteArrayList<>();
+    protected List<InstanceManager> instanceManagerList = new ArrayList<>();
 
     // 已启动的实例
-    private List<String> startedInstances = new CopyOnWriteArrayList<>();
+    private List<String> startedInstances = new ArrayList<>();
 
     // 未启动的实例
-    private List<String> notStartedInstances = new CopyOnWriteArrayList<>();
+    private List<String> notStartedInstances = new ArrayList<>();
 
     // 任务调度器
     private ScheduledExecutorService scheduled;
@@ -110,6 +110,7 @@ public class ApplicationManager implements Closeable,
                 InstanceStatus instanceStatus = instanceManager.getInstanceStatus();
                 if (instanceStatus == InstanceStatus.UP ||
                         instanceStatus == InstanceStatus.DOWN) {
+                    instanceManager.launch();
                     startedInstances.add(instanceManager.getInstanceInfo().getInstanceId());
                     return;
                 }
@@ -458,6 +459,14 @@ public class ApplicationManager implements Closeable,
                 .filter(instanceInfo -> instanceInfo.getInstanceId().equals(instanceId))
                 .findFirst();
         return optional.orElse(null);
+    }
+
+    public boolean isVirtualClosed() {
+        return virtualClosed;
+    }
+
+    public boolean isPhysicalClosed() {
+        return physicalClosed;
     }
 }
 

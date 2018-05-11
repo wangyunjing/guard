@@ -14,11 +14,15 @@ public abstract class AbstractLauncher implements Launcher, GuardManagementEndpo
 
     protected volatile boolean launched = false;
 
-
     public AbstractLauncher(GuardContext guardContext) {
         this.guardContext = guardContext;
     }
 
+    // 是否启动
+    @Override
+    public boolean isLaunched() {
+        return launched;
+    }
 
     @Override
     public void refresh(Integer applicationId, String instanceId) {

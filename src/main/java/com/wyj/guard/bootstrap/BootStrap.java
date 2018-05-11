@@ -118,6 +118,11 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint, Applica
     }
 
     @Override
+    public void open() {
+        launcher.open();
+    }
+
+    @Override
     public boolean addInstance(InstanceConfig instanceConfig) {
         return launcher.addInstance(instanceConfig);
     }

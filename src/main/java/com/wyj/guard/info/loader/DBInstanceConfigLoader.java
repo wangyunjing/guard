@@ -205,8 +205,19 @@ public class DBInstanceConfigLoader extends InstanceConfigLoader {
     }
 
     @Override
+    public boolean removeInstanceByApplication(Integer applicationId) {
+        try {
+            jdbcTemplate.update("DELETE FROM instance WHERE application_id = ?", applicationId);
+        } catch (Exception e) {
+            logger.error("移除实例失败!, 应用ID：{}", applicationId, e);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean updateInstance(Instance instance) {
-        String sql = "UPDATE FROM instance SET start_command=?,health_url=?," +
+        String sql = "UPDATE instance SET start_command=?,health_url=?," +
                 "weight=?,username=?,password=?,heartbeat_rate=?,initialize_instance_duration=?," +
                 "self_protected_duration=?,status=? WHERE instance_id=?";
         List<Object> list = new ArrayList<>();

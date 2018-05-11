@@ -12,4 +12,9 @@ public interface GuardManagementEndpoint {
      */
     void close();
 
+    /**
+     * 开启所有的实例
+     */
+    void open();
+
 }

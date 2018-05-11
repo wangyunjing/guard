@@ -197,7 +197,7 @@ public class JSCHClient implements SSHClient {
                                            SSHCommandExec sshCommandExec,
                                            String command, InstanceInfo instanceInfo) {
         if (session == null) {
-            return null;
+            return new String[0];
         }
         String[] results = null;
         BufferedReader bufferedReader = null;
