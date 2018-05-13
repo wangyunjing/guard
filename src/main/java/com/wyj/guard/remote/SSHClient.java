@@ -19,5 +19,4 @@ public interface SSHClient {
     // 获取实例状态
     InstanceStatus getInstanceStatus(InstanceInfo instanceInfo);
 
-    ServerStatus getServerStatus(InstanceInfo instanceInfo);
 }

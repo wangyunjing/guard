@@ -271,10 +271,6 @@ public class InstanceManager implements Closeable, ApplicationListener<Applicati
         return sshClient.getInstanceStatus(getInstanceInfo());
     }
 
-    public ServerStatus getServerStatus() {
-        return sshClient.getServerStatus(getInstanceInfo());
-    }
-
     public Long getLaunchTime() {
         return launchTime;
     }
