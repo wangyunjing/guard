@@ -1,5 +1,8 @@
 package com.wyj.guard.bootstrap;
 
+import com.wyj.guard.bootstrap.paxos.Acceptor;
+import com.wyj.guard.bootstrap.paxos.Vote;
+import com.wyj.guard.bootstrap.paxos.VotingResult;
 import com.wyj.guard.context.ConfigurableGuardContext;
 import com.wyj.guard.context.DefaultGuardContext;
 import com.wyj.guard.context.GuardContext;
@@ -34,15 +37,13 @@ import java.util.function.Function;
  * 统一启动类
  */
 @Component
-public class BootStrap implements GuardContext, GuardManagementEndpoint, ApplicationEndpoint, InstanceEndpoint{
+public class BootStrap implements GuardContext, GuardManagementEndpoint,
+        ApplicationEndpoint, InstanceEndpoint, Acceptor {
 
     private final Logger logger = LoggerFactory.getLogger(BootStrap.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-//    @Autowired
-//    private RedisTemplate redisTemplate;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -83,8 +84,30 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint, Applica
     }
 
     public boolean launch() {
-        launcher = new SingleLauncher(guardContext);
+        if (guardProperties.isWhetherCluster()) {
+            launcher = new CloudLauncher(guardContext);
+        } else {
+            launcher = new SingleLauncher(guardContext);
+        }
         return launcher.launch();
+    }
+
+    @Override
+    public VotingResult preparePhase(Vote vote) {
+        if (launcher instanceof CloudLauncher) {
+            CloudLauncher cloudLauncher = (CloudLauncher) launcher;
+            return cloudLauncher.preparePhase(vote);
+        }
+        return null;
+    }
+
+    @Override
+    public VotingResult acceptPhase(Vote vote) {
+        if (launcher instanceof CloudLauncher) {
+            CloudLauncher cloudLauncher = (CloudLauncher) launcher;
+            return cloudLauncher.acceptPhase(vote);
+        }
+        return null;
     }
 
     @Override

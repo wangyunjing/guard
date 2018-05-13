@@ -22,8 +22,6 @@ public class DefaultGuardContext extends AbstractGuardContext {
 
     private GuardProperties guardProperties;
 
-//    private RedisTemplate redisTemplate;
-
     private SSHClient sshClient;
 
     private Function<InstanceConfig, InstanceInfo> instanceInfoSupplier;
@@ -35,8 +33,6 @@ public class DefaultGuardContext extends AbstractGuardContext {
     private InstanceConfigLoader instanceConfigLoader;
 
     private RestTemplate restTemplate;
-
-//    private Set<Refreshable> refreshables = new CopyOnWriteArraySet<>();
 
     @Override
     public Environment getEnvironment() {
@@ -57,27 +53,6 @@ public class DefaultGuardContext extends AbstractGuardContext {
     public GuardProperties getGuardProperties() {
         return this.guardProperties;
     }
-
-//    @Override
-//    public void setRedisTemplate(RedisTemplate redisTemplate) {
-//        this.redisTemplate = redisTemplate;
-//    }
-//
-
-
-//    @Override
-//    public DistributedLock getDistributedLock(String key) {
-//        Integer expireMS = guardProperties.getReadTimeout() +
-//                guardProperties.getConnectTimeout() + guardProperties.getConnectionRequestTimeout();
-//        expireMS = expireMS * 3 + expireMS / 2;
-//        return getDistributedLock(key, expireMS);
-//    }
-//
-//    @Override
-//    public DistributedLock getDistributedLock(String key, int expireMS) {
-//        DistributedLock distributedLock = new RedisDistributedLock(redisTemplate, key, expireMS);
-//        return distributedLock;
-//    }
 
     @Override
     public void setSSHClient(SSHClient sshClient) {
@@ -137,26 +112,6 @@ public class DefaultGuardContext extends AbstractGuardContext {
         return restTemplate;
     }
 
-//    @Override
-//    public Refreshable[] getRefreshConfigs() {
-//        return refreshables.toArray(new Refreshable[refreshables.size()]);
-//    }
-//
-//    @Override
-//    public void addRefreshableConfig(Refreshable refreshableConfig) {
-//        refreshables.add(refreshableConfig);
-//    }
-//
-//    @Override
-//    public void addRefreshableConfigs(Refreshable[] refreshableConfigs) {
-//        refreshables.addAll(Arrays.asList(refreshableConfigs));
-//    }
-//
-//    @Override
-//    public void setRefreshableConfigs(Refreshable[] refreshableConfigs) {
-//        refreshables.clear();
-//        refreshables.addAll(Arrays.asList(refreshableConfigs));
-//    }
 }
 
 

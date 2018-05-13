@@ -8,6 +8,13 @@ public class GuardProperties {
     // 是否集群模式
     private boolean whetherCluster = true;
 
+    // 集群应用的ID
+    private int clusterApplicationId = 1;
+
+    // paxos实例的个数
+    private int paxosInstanceNum = -1;
+
+
     // 从Http连接池中获取连接的超时时间
     private Integer connectionRequestTimeout = 5000;
 
@@ -47,5 +54,21 @@ public class GuardProperties {
 
     public void setReadTimeout(Integer readTimeout) {
         this.readTimeout = readTimeout;
+    }
+
+    public int getPaxosInstanceNum() {
+        return paxosInstanceNum;
+    }
+
+    public void setPaxosInstanceNum(int paxosInstanceNum) {
+        this.paxosInstanceNum = paxosInstanceNum;
+    }
+
+    public int getClusterApplicationId() {
+        return clusterApplicationId;
+    }
+
+    public void setClusterApplicationId(int clusterApplicationId) {
+        this.clusterApplicationId = clusterApplicationId;
     }
 }

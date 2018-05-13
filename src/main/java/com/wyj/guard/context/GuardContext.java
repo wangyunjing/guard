@@ -19,10 +19,6 @@ public interface GuardContext extends ApplicationEventPublisher {
 
     GuardProperties getGuardProperties();
 
-//    DistributedLock getDistributedLock(String key);
-//
-//    DistributedLock getDistributedLock(String key, int expireMS);
-
     SSHClient getSSHClient();
 
     Function<InstanceConfig, InstanceInfo> getInstanceInfoSupplier();
@@ -32,6 +28,4 @@ public interface GuardContext extends ApplicationEventPublisher {
     AppConfigLoader getAppConfigLoader();
 
     InstanceConfigLoader getInstanceConfigLoader();
-
-//    Refreshable[] getRefreshConfigs();
 }

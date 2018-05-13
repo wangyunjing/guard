@@ -23,6 +23,8 @@ public class GuardApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        bootStrap.launch();
+        if (!bootStrap.launch()) {
+            System.exit(1);
+        }
     }
 }
