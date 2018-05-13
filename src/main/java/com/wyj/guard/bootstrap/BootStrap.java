@@ -72,6 +72,7 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
         // 设置远程连接服务器的类
         guardContext.setSSHClient(new JSCHClient(restTemplate));
 
+
         // 设置加载资源的类
         guardContext.setAppConfigLoader(new DBAppConfigLoader(jdbcTemplate));
         guardContext.setInstanceConfigLoader(new DBInstanceConfigLoader(
@@ -81,6 +82,10 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
         guardContext.setInstanceInfoSupplier(new InstanceInfoSupplier());
         guardContext.setApplicationInfoSupplier(new ApplicationInfoSupplier());
 
+        if (guardContext instanceof DefaultGuardContext) {
+            DefaultGuardContext defaultGuardContext = (DefaultGuardContext) guardContext;
+            defaultGuardContext.setRestTemplate(restTemplate);
+        }
     }
 
     public boolean launch() {
