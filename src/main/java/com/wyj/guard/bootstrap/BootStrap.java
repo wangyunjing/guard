@@ -1,8 +1,6 @@
 package com.wyj.guard.bootstrap;
 
-import com.wyj.guard.bootstrap.paxos.Acceptor;
-import com.wyj.guard.bootstrap.paxos.Vote;
-import com.wyj.guard.bootstrap.paxos.VotingResult;
+import com.wyj.guard.bootstrap.paxos.*;
 import com.wyj.guard.context.ConfigurableGuardContext;
 import com.wyj.guard.context.DefaultGuardContext;
 import com.wyj.guard.context.GuardContext;
@@ -38,7 +36,7 @@ import java.util.function.Function;
  */
 @Component
 public class BootStrap implements GuardContext, GuardManagementEndpoint,
-        ApplicationEndpoint, InstanceEndpoint, Acceptor {
+        ApplicationEndpoint, InstanceEndpoint, Acceptor, Lease {
 
     private final Logger logger = LoggerFactory.getLogger(BootStrap.class);
 
@@ -111,6 +109,15 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
         if (launcher instanceof CloudLauncher) {
             CloudLauncher cloudLauncher = (CloudLauncher) launcher;
             return cloudLauncher.acceptPhase(vote);
+        }
+        return null;
+    }
+
+    @Override
+    public LeaseResult lease(Long round, String instanceId) {
+        if (launcher instanceof CloudLauncher) {
+            CloudLauncher cloudLauncher = (CloudLauncher) launcher;
+            return cloudLauncher.lease(round, instanceId);
         }
         return null;
     }

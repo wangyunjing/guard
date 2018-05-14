@@ -1,5 +1,6 @@
 package com.wyj.guard.bootstrap;
 
+import com.alibaba.druid.util.DaemonThreadFactory;
 import com.wyj.guard.bootstrap.paxos.*;
 import com.wyj.guard.context.DefaultGuardContext;
 import com.wyj.guard.context.GuardContext;
@@ -10,9 +11,12 @@ import com.wyj.guard.web.InstanceCondition;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-public class CloudLauncher extends AbstractLauncher implements Acceptor {
+public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
 
     private GuardProperties guardProperties;
 
@@ -22,13 +26,21 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor {
 
     private SingleLauncher launcher;
 
+    // 用来重新选择主节点的线程池
+    private ExecutorService task;
+
     public CloudLauncher(GuardContext guardContext) {
         super(guardContext);
         guardProperties = guardContext.getGuardProperties();
+        task = Executors.newSingleThreadExecutor(new DaemonThreadFactory("CloudLauncher-Task"));
     }
 
     @Override
     public synchronized boolean launch() {
+        if (launcher != null) {
+            launcher.destroy();
+            launcher = null;
+        }
         // 重新加载应用
         loadApplications();
         // 投票 - 选举主节点
@@ -37,7 +49,8 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor {
                 DefaultGuardContext defaultGuardContext = (DefaultGuardContext) guardContext;
                 paxos = new Paxos(defaultGuardContext.getRestTemplate(),
                         guardProperties.getPaxosInstanceNum(),
-                        getOwnInstanceId(), getAllInstanceIds(), this::launch);
+                        getOwnInstanceId(), getAllInstanceIds(),
+                        () -> CompletableFuture.supplyAsync(this::launch, task));
             } else {
                 throw new RuntimeException("没有找到RestTemplate。");
             }
@@ -48,12 +61,6 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor {
             // 自身为主节点
             launcher = new SingleLauncher(guardContext, applicationManagers);
             return launcher.launch();
-        } else {
-            // 自身不为主节点
-            if (launcher != null) {
-                launcher.destroy();
-                launcher = null;
-            }
         }
         return true;
     }
@@ -103,5 +110,10 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor {
     @Override
     public VotingResult acceptPhase(Vote vote) {
         return paxos.acceptPhase(vote);
+    }
+
+    @Override
+    public LeaseResult lease(Long round, String instanceId) {
+        return paxos.lease(round, instanceId);
     }
 }

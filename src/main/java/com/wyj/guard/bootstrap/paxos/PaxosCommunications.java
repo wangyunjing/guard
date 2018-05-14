@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -74,8 +75,21 @@ public class PaxosCommunications {
                 .collect(Collectors.toList());
     }
 
-    public Object lease(String instanceId) {
+    public LeaseResult lease(Long round, String instanceId) {
         // TODO: 2018/5/13
+        String url = SCHEMA + "://" + instanceId + LEASE_PATH;
+        Map<String, Object> map = new HashMap<>();
+        map.put("round", round);
+        map.put("instanceId", instanceId);
+        try {
+            JSONObject jsonObject = putJSON(url, "", map);
+            if (jsonObject == null) {
+                return null;
+            }
+            return jsonObject.toJavaObject(LeaseResult.class);
+        } catch (Exception e) {
+            //
+        }
         return null;
     }
 
@@ -83,10 +97,18 @@ public class PaxosCommunications {
         this.allInstances = allInstances;
     }
 
+    public List<String> getAllInstances() {
+        return allInstances;
+    }
 
     private JSONObject putJSON(String url, String body, Map<String, Object> map) {
         try {
             URIBuilder uriBuilder = new URIBuilder(url);
+            if (map != null) {
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    uriBuilder.setParameter(entry.getKey(), entry.getValue().toString());
+                }
+            }
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
