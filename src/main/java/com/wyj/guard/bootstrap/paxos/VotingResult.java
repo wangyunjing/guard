@@ -17,6 +17,9 @@ public class VotingResult {
     // 当前投票是否通过
     private boolean passing;
 
+    // 接收方的当前投票编号
+    private Long proposedNum;
+
     // 接收方当前已接受的投票编号
     private Long acceptProposedNum;
 
@@ -56,6 +59,14 @@ public class VotingResult {
 
     public void setPassing(boolean passing) {
         this.passing = passing;
+    }
+
+    public Long getProposedNum() {
+        return proposedNum;
+    }
+
+    public void setProposedNum(Long proposedNum) {
+        this.proposedNum = proposedNum;
     }
 
     public Long getAcceptProposedNum() {

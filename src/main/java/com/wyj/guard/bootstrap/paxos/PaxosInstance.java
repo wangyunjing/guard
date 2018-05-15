@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class PaxosInstance implements Proposer, Acceptor {
@@ -67,6 +68,7 @@ public class PaxosInstance implements Proposer, Acceptor {
 
                 List<VotingResult> results = communications.first(vote);
                 int passNum = 0;
+                long maxProposedNum = proposedNum.get();
                 long maxAcceptProposedNum = -1;
                 String curValue = value;
                 for (VotingResult votingResult : results) {
@@ -89,10 +91,15 @@ public class PaxosInstance implements Proposer, Acceptor {
                             maxAcceptProposedNum = votingResult.getAcceptProposedNum();
                             curValue = votingResult.getAcceptValue();
                         }
+                    } else {
+                        if (votingResult.getProposedNum() != null) {
+                            maxProposedNum = Math.max(maxProposedNum, votingResult.getProposedNum());
+                        }
                     }
                 }
                 // 小于等于半数 : 准备阶段，投票不通过
                 if (passNum <= communications.getInstanceNum() / 2) {
+                    proposedNum.set(maxProposedNum);
                     waitTime();
                     continue;
                 }
@@ -146,6 +153,7 @@ public class PaxosInstance implements Proposer, Acceptor {
             VotingResult result = new VotingResult();
             if (vote.getProposedNum() <= proposedNum.get()) {
                 result.setPassing(false);
+                result.setProposedNum(proposedNum.get());
                 return result;
             }
             proposedNum.set(vote.getProposedNum());
@@ -165,7 +173,11 @@ public class PaxosInstance implements Proposer, Acceptor {
                 result.setPassing(false);
                 return result;
             }
-            acceptProposedNum.set(vote.getProposedNum());
+            if (acceptProposedNum == null) {
+                acceptProposedNum = new AtomicLong(vote.getProposedNum());
+            } else {
+                acceptProposedNum.set(vote.getProposedNum());
+            }
             acceptValue = vote.getValue();
             result.setPassing(true);
             return result;

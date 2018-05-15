@@ -1,9 +1,6 @@
 package com.wyj.guard.bootstrap.paxos;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class BoundedCollection<E> {
@@ -63,6 +60,10 @@ public class BoundedCollection<E> {
             return null;
         }
         return data.get(data.size() - 1);
+    }
+
+    public List<E> getAllData() {
+        return Collections.unmodifiableList(data);
     }
 
     public Iterator<E> iterator() {

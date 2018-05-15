@@ -48,7 +48,7 @@ public abstract class AbstractLauncher implements Launcher, GuardManagementEndpo
 
     protected void destroy() {
         if (applicationManagers != null) {
-            logger.info("销毁所有应用管理器...");
+            logger.debug("销毁所有应用管理器...");
             applicationManagers.forEach(applicationManager -> {
                 if (!applicationManager.isVirtualClosed()) {
                     applicationManager.virtualClose();
@@ -56,6 +56,7 @@ public abstract class AbstractLauncher implements Launcher, GuardManagementEndpo
                 applicationManager.selfClose();
             });
             applicationManagers.clear();
+            logger.debug("销毁所有应用管理器成功");
         }
     }
 

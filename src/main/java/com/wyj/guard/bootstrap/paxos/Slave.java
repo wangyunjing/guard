@@ -20,12 +20,17 @@ public class Slave extends Node {
 
     private String master;
 
-    public Slave(long round, Consumer<Long> callback, String master,
+    public Slave(long round, String ownInstanceId, Consumer<Long> callback, String master,
                  PaxosCommunications communications) {
-        super(round, callback);
+        super(round, ownInstanceId, callback);
         this.communications = communications;
         this.master = master;
         scheduled.schedule(new FollowerOfLeaseTask(), 0, TimeUnit.MILLISECONDS);
+    }
+
+    public Slave(long round, String ownInstanceId, String master) {
+        super(round, ownInstanceId, null);
+        this.master = master;
     }
 
     // 从节点维护租约的任务
@@ -36,18 +41,22 @@ public class Slave extends Node {
                 if (!lease.get()) {
                     return;
                 }
-                LeaseResult leaseResult = communications.lease(round, master);
+                logger.debug("{} Slave Node start heartbeat...", round);
+                LeaseResult leaseResult = communications.lease(round, master, ownInstanceId);
                 if (leaseResult == null ||
                         leaseResult.getRoundComparison() != 0) {
-                    if (lastTime.get() != -1 &&
-                            lastTime.get() + protectedLeaseTime <= DateTimeUtils.getCurrentTime()) {
-                        lease.set(false);
-                    } else {
+                    // 续租失败
+                    if (lastTime.get() == -1) {
                         lastTime.set(DateTimeUtils.getCurrentTime());
                     }
+                    if (lastTime.get() + protectedLeaseTime <= DateTimeUtils.getCurrentTime()) {
+                        lease.set(false);
+                    }
+                } else {
+                    lastTime.set(-1);
                 }
             } catch (Exception e) {
-                logger.error("FollowerOfLeaseTask error", e);
+                logger.error("{} Slave Node#FollowerOfLeaseTask error", round, e);
             } finally {
                 if (lease.get()) {
                     // 还是从节点

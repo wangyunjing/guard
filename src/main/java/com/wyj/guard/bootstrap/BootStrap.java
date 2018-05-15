@@ -95,6 +95,14 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
         return launcher.launch();
     }
 
+    public Object isMaster(String instanceId) {
+        if (launcher instanceof CloudLauncher) {
+            CloudLauncher cloudLauncher = (CloudLauncher) launcher;
+            return cloudLauncher.isMaster(instanceId);
+        }
+        return null;
+    }
+
     @Override
     public VotingResult preparePhase(Vote vote) {
         if (launcher instanceof CloudLauncher) {

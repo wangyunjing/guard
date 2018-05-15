@@ -1,5 +1,6 @@
 package com.wyj.guard.web.controller;
 
+import com.wyj.guard.bootstrap.BootStrap;
 import com.wyj.guard.bootstrap.paxos.Acceptor;
 import com.wyj.guard.bootstrap.paxos.Lease;
 import com.wyj.guard.bootstrap.paxos.Vote;
@@ -15,6 +16,9 @@ public class PaxosController {
 
     @Autowired
     Lease lease;
+
+    @Autowired
+    BootStrap bootStrap;
 
     /**
      * 准备阶段
@@ -47,7 +51,7 @@ public class PaxosController {
     @GetMapping("/paxos/is_master")
     public Object isMaster(@RequestParam(value = "instanceId", required = false)
                                    String instanceId) {
-        // TODO: 2018/5/14
-        return null;
+
+        return bootStrap.isMaster(instanceId);
     }
 }

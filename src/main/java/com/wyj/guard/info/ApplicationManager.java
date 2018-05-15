@@ -141,6 +141,9 @@ public class ApplicationManager implements Closeable,
 
     @Override
     public boolean virtualClose() {
+        if (!ThreadPoolUtils.isAvailable(taskExecutor)) {
+            return true;
+        }
         return CompletableFuture.supplyAsync(() -> {
             logger.info("{} 应用虚拟关闭...", getApplicationInfo().getApplicationName());
             for (InstanceManager instanceManager : instanceManagerList) {
@@ -165,6 +168,9 @@ public class ApplicationManager implements Closeable,
 
     @Override
     public boolean physicalClose() {
+        if (!ThreadPoolUtils.isAvailable(taskExecutor)) {
+            return true;
+        }
         return asyncPhysicalClose().join();
     }
 

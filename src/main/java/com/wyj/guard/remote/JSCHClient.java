@@ -7,7 +7,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.wyj.guard.info.InstanceInfo;
 import com.wyj.guard.share.enums.InstanceStatus;
-import com.wyj.guard.share.enums.ServerStatus;
 import com.wyj.guard.utils.StringPlaceholderResolver;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;

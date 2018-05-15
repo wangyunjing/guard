@@ -20,4 +20,11 @@ public class ThreadPoolUtils {
         }
     }
 
+
+    public static boolean isAvailable(ExecutorService threadPool) {
+        if (threadPool == null || threadPool.isShutdown()) {
+            return false;
+        }
+        return true;
+    }
 }

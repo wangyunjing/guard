@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -75,12 +72,12 @@ public class PaxosCommunications {
                 .collect(Collectors.toList());
     }
 
-    public LeaseResult lease(Long round, String instanceId) {
+    public LeaseResult lease(Long round, String master, String slave) {
         // TODO: 2018/5/13
-        String url = SCHEMA + "://" + instanceId + LEASE_PATH;
+        String url = SCHEMA + "://" + master + LEASE_PATH;
         Map<String, Object> map = new HashMap<>();
         map.put("round", round);
-        map.put("instanceId", instanceId);
+        map.put("instanceId", slave);
         try {
             JSONObject jsonObject = putJSON(url, "", map);
             if (jsonObject == null) {
@@ -114,9 +111,8 @@ public class PaxosCommunications {
             httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
             HttpEntity<String> httpEntity = new HttpEntity<>(body, httpHeaders);
-
-            ResponseEntity<JSONObject> responseEntity = restTemplate.postForEntity(uriBuilder.build(),
-                    httpEntity, JSONObject.class);
+            ResponseEntity<JSONObject> responseEntity = restTemplate.exchange(uriBuilder.build(),
+                    HttpMethod.PUT, httpEntity, JSONObject.class);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 return responseEntity.getBody();
             }

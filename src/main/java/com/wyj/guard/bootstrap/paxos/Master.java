@@ -18,13 +18,21 @@ public class Master extends Node implements Lease {
     // 排除自身实例的其他所有实例的租约
     private List<Pair<String, Long>> leaseInstances;
 
-    public Master(long round, Consumer<Long> callback, List<String> nodes) {
-        super(round, callback);
+    public Master(long round, String ownInstanceId, Consumer<Long> callback, List<String> nodes) {
+        super(round, ownInstanceId, callback);
         long time = DateTimeUtils.getCurrentTime();
         leaseInstances = nodes.stream()
                 .map(instanceId -> Pair.newPair(instanceId, time))
                 .collect(Collectors.toList());
         scheduled.schedule(new LeaderOfLeaseTask(), 0, TimeUnit.MILLISECONDS);
+    }
+
+    public Master(long round, String ownInstanceId, List<String> nodes) {
+        super(round, ownInstanceId, null);
+        long time = DateTimeUtils.getCurrentTime();
+        leaseInstances = nodes.stream()
+                .map(instanceId -> Pair.newPair(instanceId, time))
+                .collect(Collectors.toList());
     }
 
 
@@ -33,6 +41,7 @@ public class Master extends Node implements Lease {
         if (!lease.get()) {
             return null;
         }
+        logger.debug("round : {}, instanceId : {}", round, instanceId);
         synchronized (leaseInstances) {
             if (leaseInstances.removeIf(pair -> pair.getFirst().equals(instanceId))) {
                 leaseInstances.add(Pair.newPair(instanceId, DateTimeUtils.getCurrentTime()));
@@ -49,6 +58,7 @@ public class Master extends Node implements Lease {
                 if (!lease.get()) {
                     return;
                 }
+                logger.debug("{} Master Node start heartbeat...", round);
                 long curTime = DateTimeUtils.getCurrentTime();
                 synchronized (leaseInstances) {
                     // 已经断开连接的节点个数
@@ -57,13 +67,15 @@ public class Master extends Node implements Lease {
                         if (pair.getSecond() + protectedLeaseTime <= curTime) {
                             count++;
                         }
+                        logger.debug("instanceId : {}, time : {}", pair.getFirst(), pair.getSecond());
                     }
                     if (count > leaseInstances.size() / 2) {
                         lease.set(false);
                     }
+                    logger.debug("{} Master Node heartbeat结束。count : {}, lease : {}", round, count, lease.get());
                 }
             } catch (Exception e) {
-                logger.error("LeaderOfLeaseTask error", e);
+                logger.error("{} Master Node#LeaderOfLeaseTask error", round, e);
             } finally {
                 if (lease.get()) {
                     // 还是主节点

@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -51,6 +53,30 @@ public class Paxos implements Proposer, Acceptor, Lease {
         this.communications.setAllInstances(allInstances);
     }
 
+    public Object isMaster(String instanceId) {
+        if (instanceId == null) {
+            instanceId = ownInstance;
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("instanceId", instanceId);
+        PaxosInstance last = paxosInstances.getLast();
+        if (last != null) {
+            map.put("master", last.getMaster());
+        } else {
+            map.put("master", "");
+        }
+        map.put("status", status);
+        if (instanceId.equals(map.get("master"))) {
+            map.put("isMaster", true);
+        } else {
+            map.put("isMaster", false);
+        }
+        map.put("round", round.get());
+        map.put("nodes", nodes.getAllData());
+        map.put("instances", paxosInstances.getAllData());
+        return map;
+    }
+
     // 同步 - 由调用方保证
     @Override
     public PaxosStatus propose() {
@@ -70,12 +96,21 @@ public class Paxos implements Proposer, Acceptor, Lease {
             switch (status) {
                 case LOOKING:
                     // 继续发起下一回合的提议
+                    synchronized (nodes) {
+                        if (instance.getMaster().equals(ownInstance)) {
+                            Master master = new Master(round.get(), ownInstance, getNodesExcludeOwn());
+                            nodes.add(master);
+                        } else {
+                            Slave slave = new Slave(round.get(), ownInstance, instance.getMaster());
+                            nodes.add(slave);
+                        }
+                    }
                     break;
                 case LEADER:
                     // 是主节点
                     // 1 : 定时维护其他实例的租约
                     synchronized (nodes) {
-                        Master master = new Master(round.get(), this::renewPropose,
+                        Master master = new Master(round.get(), ownInstance, this::renewPropose,
                                 getNodesExcludeOwn());
                         nodes.add(master);
                     }
@@ -84,8 +119,8 @@ public class Paxos implements Proposer, Acceptor, Lease {
                     // 不是主节点
                     // 1 : 定时向主节点发起租约
                     synchronized (nodes) {
-                        Slave slave = new Slave(round.get(), this::renewPropose,
-                                ownInstance, communications);
+                        Slave slave = new Slave(round.get(), ownInstance, this::renewPropose,
+                                instance.getMaster(), communications);
                         nodes.add(slave);
                     }
                     return status;
@@ -145,9 +180,11 @@ public class Paxos implements Proposer, Acceptor, Lease {
         long roundComparison = leaseRound - round.get();
         leaseResult.setRoundComparison(roundComparison);
         if (roundComparison != 0) {
+            logger.debug("lease roundComparison：{}", roundComparison);
             return leaseResult;
         }
         synchronized (nodes) {
+            logger.debug("leaseRound : {}, instanceId : {}", leaseResult, instanceId);
             Node curNode = nodes.get(node -> leaseRound.equals(node.getRound()));
             if (curNode != null) {
                 Master master = (Master) curNode;
@@ -161,6 +198,8 @@ public class Paxos implements Proposer, Acceptor, Lease {
         if (round.get() != leaseRound) {
             return;
         }
+        logger.warn("leaseRound :{}, 重新投票选举主节点...", leaseRound);
+        // TODO: 2018/5/14 维护异步处理结果
         CompletableFuture<Boolean> future = callback.get();
     }
 

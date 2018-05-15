@@ -8,7 +8,10 @@ import com.wyj.guard.context.GuardProperties;
 import com.wyj.guard.info.ApplicationManager;
 import com.wyj.guard.utils.InetUtils;
 import com.wyj.guard.web.InstanceCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -17,6 +20,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
+
+    private Logger logger = LoggerFactory.getLogger(CloudLauncher.class);
 
     private GuardProperties guardProperties;
 
@@ -33,6 +38,10 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
         super(guardContext);
         guardProperties = guardContext.getGuardProperties();
         task = Executors.newSingleThreadExecutor(new DaemonThreadFactory("CloudLauncher-Task"));
+    }
+
+    public Object isMaster(String instanceId) {
+        return paxos.isMaster(instanceId);
     }
 
     @Override
@@ -60,7 +69,7 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
         if (paxos.propose().equals(PaxosStatus.LEADER)) {
             // 自身为主节点
             launcher = new SingleLauncher(guardContext, applicationManagers);
-            return launcher.launch();
+            return cloudManager.launch() && launcher.launch();
         }
         return true;
     }
@@ -84,6 +93,11 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
     private String getOwnInstanceId() {
         List<String> instanceIds = getAllInstanceIds();
         String[] ips = InetUtils.allNotLoopbackIps();
+        List<String> tmp = new ArrayList<>();
+        tmp.addAll(Arrays.stream(ips).collect(Collectors.toList()));
+        tmp.add("127.0.0.1");
+        tmp.add("localhost");
+        ips = tmp.toArray(new String[tmp.size()]);
         String port = guardContext.getEnvironment().getProperty("server.port");
         for (String ip : ips) {
             String instanceId = ip + ":" + port;

@@ -3,7 +3,6 @@ package com.wyj.guard.remote;
 
 import com.wyj.guard.info.InstanceInfo;
 import com.wyj.guard.share.enums.InstanceStatus;
-import com.wyj.guard.share.enums.ServerStatus;
 
 /**
  * 远程连接服务器并且启动实例
