@@ -36,7 +36,7 @@ import java.util.function.Function;
  */
 @Component
 public class BootStrap implements GuardContext, GuardManagementEndpoint,
-        ApplicationEndpoint, InstanceEndpoint, Acceptor, Lease {
+        CloudEndpoint, ApplicationEndpoint, InstanceEndpoint, Acceptor, Lease {
 
     private final Logger logger = LoggerFactory.getLogger(BootStrap.class);
 
@@ -101,6 +101,15 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
             return cloudLauncher.isMaster(instanceId);
         }
         return null;
+    }
+
+    @Override
+    public Instance[] getCloudInstance() {
+        if (launcher instanceof CloudLauncher) {
+            CloudLauncher cloudLauncher = (CloudLauncher) launcher;
+            return cloudLauncher.getCloudInstance();
+        }
+        return new Instance[0];
     }
 
     @Override

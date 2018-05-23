@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 
 @SpringBootApplication
-public class GuardApplication implements CommandLineRunner {
+public class GuardApplication extends WebMvcConfigurerAdapter implements CommandLineRunner {
 
     public final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -26,5 +28,13 @@ public class GuardApplication implements CommandLineRunner {
         if (!bootStrap.launch()) {
             System.exit(1);
         }
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        super.addCorsMappings(registry);
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET","POST","PUT","DELETE");
     }
 }

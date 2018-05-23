@@ -26,7 +26,7 @@ public class DBInstanceConfig extends AbstractInstanceConfig {
         super(applicationConfig, instanceId);
         this.jdbcTemplate = jdbcTemplate;
         this.DEFAULT_QUERY_PLACEHOLDER_SQL = "SELECT $ FROM instance where instance_id = ?";
-        this.DEFAULT_UPDATE_PLACEHOLDER_SQL = "UPDATE instance SET &=? WHERE instance_id=?";
+        this.DEFAULT_UPDATE_PLACEHOLDER_SQL = "UPDATE instance SET $=? WHERE instance_id=?";
         args = new Object[]{instanceId};
     }
 

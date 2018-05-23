@@ -62,7 +62,7 @@ public class ApplicationController {
     public void physicalCloseApplication(@PathVariable("applicationId") Integer applicationId) {
         ApplicationConfig applicationConfig = context.getAppConfigLoader().load(applicationId);
         if (applicationConfig != null) {
-            if (applicationConfig instanceof ConfigurableApplicationContext) {
+            if (applicationConfig instanceof ConfigurableApplicationConfig) {
                 ConfigurableApplicationConfig configurableApplicationConfig = (ConfigurableApplicationConfig) applicationConfig;
                 configurableApplicationConfig.setStatus(LaunchStatus.SHUTDOWN);
                 managementEndpoint.refresh(applicationId, null);
@@ -74,7 +74,7 @@ public class ApplicationController {
     public void physicalOpenApplication(@PathVariable("applicationId") Integer applicationId) {
         ApplicationConfig applicationConfig = context.getAppConfigLoader().load(applicationId);
         if (applicationConfig != null) {
-            if (applicationConfig instanceof ConfigurableApplicationContext) {
+            if (applicationConfig instanceof ConfigurableApplicationConfig) {
                 ConfigurableApplicationConfig configurableApplicationConfig = (ConfigurableApplicationConfig) applicationConfig;
                 configurableApplicationConfig.setStatus(LaunchStatus.UP);
                 managementEndpoint.refresh(applicationId, null);

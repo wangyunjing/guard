@@ -219,7 +219,7 @@ public class DBInstanceConfigLoader extends InstanceConfigLoader {
     public boolean updateInstance(Instance instance) {
         String sql = "UPDATE instance SET start_command=?,health_url=?," +
                 "weight=?,username=?,password=?,heartbeat_rate=?,initialize_instance_duration=?," +
-                "self_protected_duration=?,status=? WHERE instance_id=?";
+                "self_protected_duration=? WHERE instance_id=?";
         List<Object> list = new ArrayList<>();
         list.add(instance.getStartCommand());
         list.add(instance.getHealthUrl());
@@ -229,7 +229,6 @@ public class DBInstanceConfigLoader extends InstanceConfigLoader {
         list.add(instance.getHeartbeatRate());
         list.add(instance.getInitializeInstanceDuration());
         list.add(instance.getSelfProtectedDuration());
-        list.add(instance.getStatus());
         list.add(instance.getInstanceId());
         jdbcTemplate.update(sql, list.toArray());
         return true;

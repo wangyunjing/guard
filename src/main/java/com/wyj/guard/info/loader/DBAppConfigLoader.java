@@ -117,7 +117,7 @@ public class DBAppConfigLoader extends AppConfigLoader {
     public boolean updateApplication(Application application) {
         String sql = "UPDATE application SET port=?,health_url=?,start_instance_num=?," +
                 "start_command=?,username=?,password=?,heartbeat_rate=?,initialize_instance_duration=?," +
-                "self_protected_duration=?,status=?,defend_instance_duration=? WHERE id=?";
+                "self_protected_duration=?,defend_instance_duration=? WHERE id=?";
         List<Object> list = new ArrayList<>();
         list.add(application.getPort());
         list.add(application.getHealthUrl());
@@ -128,7 +128,6 @@ public class DBAppConfigLoader extends AppConfigLoader {
         list.add(application.getHeartbeatRate());
         list.add(application.getInitializeInstanceDuration());
         list.add(application.getSelfProtectedDuration());
-        list.add(application.getStatus());
         list.add(application.getDefendInstanceDuration());
         list.add(application.getApplicationId());
         jdbcTemplate.update(sql, list.toArray());

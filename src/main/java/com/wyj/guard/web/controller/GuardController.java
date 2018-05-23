@@ -1,17 +1,23 @@
 package com.wyj.guard.web.controller;
 
+import com.wyj.guard.context.GuardProperties;
 import com.wyj.guard.web.GuardManagementEndpoint;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class GuardController {
 
     @Autowired
     GuardManagementEndpoint managementEndpoint;
+
+    @Autowired
+    GuardProperties guardProperties;
+
+    @GetMapping("/guard/is_cloud")
+    public boolean isCloud() {
+        return guardProperties.isWhetherCluster();
+    }
 
     @PostMapping("/guard/refresh")
     public void refreshConfig(@RequestParam(value = "applicationId", required = false) Integer applicationId,

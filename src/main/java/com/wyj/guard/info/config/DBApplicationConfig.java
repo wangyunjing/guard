@@ -49,7 +49,11 @@ public class DBApplicationConfig extends AbstractApplicationConfig {
 
         return jdbcTemplate.query(sql, new Object[]{applicationId}, (resultSet) -> {
             if (resultSet.next()) {
-                return resultSet.getInt(1);
+                Object object = resultSet.getObject(1);
+                if (object == null) {
+                    return null;
+                }
+                return (Integer) object;
             }
             return null;
         });
@@ -157,7 +161,11 @@ public class DBApplicationConfig extends AbstractApplicationConfig {
 
         return jdbcTemplate.query(sql, new Object[]{applicationId}, (resultSet) -> {
             if (resultSet.next()) {
-                return resultSet.getInt(1);
+                Object object = resultSet.getObject(1);
+                if (object == null) {
+                    return null;
+                }
+                return (Integer) object;
             }
             return null;
         });
@@ -187,7 +195,11 @@ public class DBApplicationConfig extends AbstractApplicationConfig {
 
         return jdbcTemplate.query(sql, new Object[]{applicationId}, (resultSet) -> {
             if (resultSet.next()) {
-                return resultSet.getInt(1);
+                Object object = resultSet.getObject(1);
+                if (object == null) {
+                    return null;
+                }
+                return (Integer) object;
             }
             return null;
         });
@@ -199,7 +211,11 @@ public class DBApplicationConfig extends AbstractApplicationConfig {
 
         return jdbcTemplate.query(sql, new Object[]{applicationId}, (resultSet) -> {
             if (resultSet.next()) {
-                return resultSet.getInt(1);
+                Object object = resultSet.getObject(1);
+                if (object == null) {
+                    return null;
+                }
+                return (Integer) object;
             }
             return null;
         });
@@ -211,7 +227,11 @@ public class DBApplicationConfig extends AbstractApplicationConfig {
 
         return jdbcTemplate.query(sql, new Object[]{applicationId}, (resultSet) -> {
             if (resultSet.next()) {
-                return resultSet.getInt(1);
+                Object object = resultSet.getObject(1);
+                if (object == null) {
+                    return null;
+                }
+                return (Integer) object;
             }
             return null;
         });

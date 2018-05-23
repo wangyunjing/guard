@@ -1,12 +1,15 @@
 package com.wyj.guard.bootstrap;
 
 import com.alibaba.druid.util.DaemonThreadFactory;
+import com.alibaba.fastjson.JSON;
 import com.wyj.guard.bootstrap.paxos.*;
 import com.wyj.guard.context.DefaultGuardContext;
 import com.wyj.guard.context.GuardContext;
 import com.wyj.guard.context.GuardProperties;
 import com.wyj.guard.info.ApplicationManager;
 import com.wyj.guard.utils.InetUtils;
+import com.wyj.guard.web.CloudEndpoint;
+import com.wyj.guard.web.Instance;
 import com.wyj.guard.web.InstanceCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +22,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
+public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease,
+        CloudEndpoint{
 
     private Logger logger = LoggerFactory.getLogger(CloudLauncher.class);
 
@@ -97,6 +101,8 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
         tmp.addAll(Arrays.stream(ips).collect(Collectors.toList()));
         tmp.add("127.0.0.1");
         tmp.add("localhost");
+        logger.debug("getAllInstanceIds={}", JSON.toJSONString(tmp));
+
         ips = tmp.toArray(new String[tmp.size()]);
         String port = guardContext.getEnvironment().getProperty("server.port");
         for (String ip : ips) {
@@ -114,6 +120,14 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
         return Arrays.stream(cloudManager.queryInstance(condition))
                 .map(instance -> instance.getInstanceId())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Instance[] getCloudInstance() {
+        if (cloudManager == null) {
+            return new Instance[0];
+        }
+        return cloudManager.queryInstance(null);
     }
 
     @Override

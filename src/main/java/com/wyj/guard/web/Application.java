@@ -1,6 +1,5 @@
 package com.wyj.guard.web;
 
-import com.wyj.guard.info.ApplicationInfo;
 import com.wyj.guard.info.ApplicationManager;
 import com.wyj.guard.info.config.ApplicationConfig;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -57,6 +56,7 @@ public class Application {
     /**
      * 状态 {@link com.wyj.guard.share.enums.LaunchStatus}
      */
+    @NotNull
     private Short status;
 
     // 启动状态 {"虚拟关闭", "物理关闭", "启动中"}

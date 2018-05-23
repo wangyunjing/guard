@@ -5,6 +5,7 @@
     <title>Guard</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/toastr.min.css">
 </head>
 <body>
 <div class="container-fluid index">
@@ -136,7 +137,9 @@
                         <button type="button" class="btn btn-warning" @click="editApplication(application.applicationId)"
                                 data-toggle="modal" data-target="#editApplicationModal">编辑</button>
                         <button type="button" class="btn btn-danger" @click="closeApplication(application.applicationId)"
-                                data-toggle="modal" data-target="#closeApplicationModal">关闭</button>
+                                data-toggle="modal" data-target="#closeApplicationModal" v-if="application.status == 1">关闭</button>
+                        <button type="button" class="btn btn-danger" @click="startApplication(application.applicationId)"
+                                data-toggle="modal" data-target="#startApplicationModal" v-if="application.status == 0">启动</button>
                         <button type="button" class="btn btn-danger" @click="deleteApplication(application.applicationId)"
                                 data-toggle="modal" data-target="#deleteApplicationModal">删除</button>
                     </div>
@@ -197,7 +200,9 @@
                                     <button type="button" class="btn btn-warning" @click="editInstance(instance.instanceId)"
                                             data-toggle="modal" data-target="#editInstanceModal">编辑</button>
                                     <button type="button" class="btn btn-danger" @click="closeInstance(instance.instanceId)"
-                                            data-toggle="modal" data-target="#closeInstanceModal">关闭</button>
+                                            data-toggle="modal" data-target="#closeInstanceModal" v-if="instance.status == 1">关闭</button>
+                                    <button type="button" class="btn btn-danger" @click="startInstance(instance.instanceId)"
+                                            data-toggle="modal" data-target="#startInstanceModal" v-if="instance.status == 0">启动</button>
                                     <button type="button" class="btn btn-danger" @click="deleteInstance(instance.instanceId)"
                                             data-toggle="modal" data-target="#deleteInstanceModal">删除</button>
                                 </div>
@@ -316,7 +321,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Definite</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @click="addApplicationAction()">Definite</button>
                 </div>
             </div>
         </div>
@@ -402,15 +407,10 @@
                         <input type="text" class="form-control" v-model="application.selfProtectedDuration"
                                placeholder="SelfProtectedDuration">
                     </div>
-                    <br>
-                    <div class="input-group">
-                        <span class="input-group-addon">是否允许启动</span>
-                        <input type="text" class="form-control" placeholder="Status" v-model="application.status">
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Definite</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @click="editApplicationAction(application.applicationId)">Definite</button>
                 </div>
             </div>
         </div>
@@ -434,7 +434,31 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Definite</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @click="closeApplicationAction(application.applicationId)">Definite</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="startApplicationModal" tabindex="-1" role="dialog" aria-labelledby="startApplicationLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="startApplicationLabel">启动应用</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>警告！</strong>您确定要启动
+                        <strong>应用ID : "<span v-text="application.applicationId"></span>"</strong>、
+                        <strong>应用名称 : "<span v-text="application.applicationName"></span>"</strong>
+                        的应用吗?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @click="startApplicationAction(application.applicationId)">Definite</button>
                 </div>
             </div>
         </div>
@@ -458,11 +482,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Definite</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @click="deleteApplicationAction(application.applicationId)">Definite</button>
                 </div>
             </div>
         </div>
     </div>
+
 
 
     <div class="modal fade" id="addInstanceModal" tabindex="-1" role="dialog" aria-labelledby="addInstanceLabel">
@@ -482,8 +507,8 @@
                     <br>
                     <div class="input-group">
                         <span class="input-group-addon">IP</span>
-                        <input type="text" class="form-control" v-model="instance.startInstanceNum"
-                               placeholder="StartInstanceNum">
+                        <input type="text" class="form-control" v-model="instance.ip"
+                               placeholder="Ip">
                     </div>
                     <br>
                     <div class="input-group">
@@ -547,7 +572,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Definite</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @click="addInstanceAction(instance.applicationId)">Definite</button>
                 </div>
             </div>
         </div>
@@ -639,15 +664,10 @@
                         <input type="text" class="form-control" v-model="instance.selfProtectedDuration"
                                placeholder="SelfProtectedDuration">
                     </div>
-                    <br>
-                    <div class="input-group">
-                        <span class="input-group-addon">是否允许启动</span>
-                        <input type="text" class="form-control" placeholder="Status" v-model="instance.status">
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Definite</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @click="editInstanceAction(instance.instanceId)">Definite</button>
                 </div>
             </div>
         </div>
@@ -672,7 +692,32 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Definite</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @click="closeInstanceAction(instance.instanceId)">Definite</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="startInstanceModal" tabindex="-1" role="dialog" aria-labelledby="startInstanceLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="startInstanceLabel">启动实例</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>警告！</strong>您确定要启动
+                        <strong>应用ID : "<span v-text="instance.applicationId"></span>"</strong>、
+                        <strong>应用名称 : "<span v-text="instance.applicationName"></span>"</strong>、
+                        <strong>实例ID : "<span v-text="instance.instanceId"></span>"</strong>
+                        的实例吗?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @click="startInstanceAction(instance.instanceId)">Definite</button>
                 </div>
             </div>
         </div>
@@ -697,7 +742,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Definite</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" @click="deleteInstanceAction(instance.instanceId)">Definite</button>
                 </div>
             </div>
         </div>
@@ -707,6 +752,7 @@
 
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+<script src="js/toastr.min.js"></script>
 <script src="js/vue.js"></script>
 <script src="js/index.js"></script>
 </body>

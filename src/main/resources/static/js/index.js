@@ -1,203 +1,34 @@
+toastr.options = {
+    closeButton: true,// 是否显示关闭按钮（提示框右上角关闭按钮）
+    debug: false,
+    progressBar: true, // 是否显示进度条（设置关闭的超时时间进度条）
+    positionClass: "toast-top-center", // 消息框在页面显示的位置
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "200",
+    timeOut: "1500",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut"
+}
 var vm = new Vue({
     el: ".index",
     data: {
         // 是否为集群模式
         cloud: true,
         // Guard实例
-        guardInstanceId: "127.0.0.1:8080",
+        guardInstanceId: "",
         // Master实例
-        masterId: "127.0.0.1:8082",
+        masterId: "-1",
         // guard集群实例
-        guardCloudInstances: [
-            {
-                "applicationId": 1,
-                "instanceId": "127.0.0.1:8080",
-                "ip": "127.0.0.1",
-                "port": 8080,
-                "healthUrl": "/health",
-                "weight": null,
-                "startCommand": "java -jar guard-1.0.0.jar >>/dev/null &",
-                "username": "root",
-                "password": "root",
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            }, {
-                "applicationId": 1,
-                "instanceId": "127.0.0.1:8081",
-                "ip": "127.0.0.1",
-                "port": 8081,
-                "healthUrl": "/health",
-                "weight": null,
-                "startCommand": "java -jar guard-1.0.0.jar >>/dev/null &",
-                "username": "root",
-                "password": "root",
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            }, {
-                "applicationId": 1,
-                "instanceId": "127.0.0.1:8082",
-                "ip": "127.0.0.1",
-                "port": 8082,
-                "healthUrl": "/health",
-                "weight": null,
-                "startCommand": "java -jar guard-1.0.0.jar >>/dev/null &",
-                "username": "root",
-                "password": "root",
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            }
-        ],
+        guardCloudInstances: [],
         // 所有应用
-        applications: [
-            {
-                "applicationId": 1,
-                "applicationName": "test1",
-                "port": 8080,
-                "healthUrl": null,
-                "startCommand": null,
-                "startInstanceNum": 2,
-                "username": "root",
-                "password": "root",
-                "defendInstanceDuration": 30000,
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            },
-            {
-                "applicationId": 2,
-                "applicationName": "test2",
-                "port": 8080,
-                "healthUrl": null,
-                "startCommand": null,
-                "startInstanceNum": 2,
-                "username": "root",
-                "password": "root",
-                "defendInstanceDuration": 30000,
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            },
-            {
-                "applicationId": 3,
-                "applicationName": "test3",
-                "port": 8080,
-                "healthUrl": null,
-                "startCommand": null,
-                "startInstanceNum": 2,
-                "username": "root",
-                "password": "root",
-                "defendInstanceDuration": 30000,
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            },
-            {
-                "applicationId": 4,
-                "applicationName": "test4",
-                "port": 8080,
-                "healthUrl": null,
-                "startCommand": null,
-                "startInstanceNum": 2,
-                "username": "root",
-                "password": "root",
-                "defendInstanceDuration": 30000,
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            },
-            {
-                "applicationId": 5,
-                "applicationName": "test5",
-                "port": 8080,
-                "healthUrl": null,
-                "startCommand": null,
-                "startInstanceNum": 2,
-                "username": "root",
-                "password": "root",
-                "defendInstanceDuration": 30000,
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            }
-        ],
+        applications: [],
         // 某一应用的所有实例
-        instances: [
-            {
-                "applicationId": 1,
-                "applicationName":"test1",
-                "instanceId": "127.0.0.1:8080",
-                "ip": "127.0.0.1",
-                "port": 8080,
-                "healthUrl": "/health",
-                "weight": null,
-                "startCommand": "java -jar guard-1.0.0.jar >>/dev/null &",
-                "username": "root",
-                "password": "root",
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            }, {
-                "applicationId": 1,
-                "applicationName":"test1",
-                "instanceId": "127.0.0.1:8081",
-                "ip": "127.0.0.1",
-                "port": 8081,
-                "healthUrl": "/health",
-                "weight": null,
-                "startCommand": "java -jar guard-1.0.0.jar >>/dev/null &",
-                "username": "root",
-                "password": "root",
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            }, {
-                "applicationId": 1,
-                "applicationName":"test1",
-                "instanceId": "127.0.0.1:8082",
-                "ip": "127.0.0.1",
-                "port": 8082,
-                "healthUrl": "/health",
-                "weight": null,
-                "startCommand": "java -jar guard-1.0.0.jar >>/dev/null &",
-                "username": "root",
-                "password": "root",
-                "heartbeatRate": 30000,
-                "initializeInstanceDuration": 40000,
-                "selfProtectedDuration": 60000,
-                "status": "是",
-                "launchStatus": "是"
-            }
-        ],
-        paxos: {
-            "ip": null,
-            "port": null,
-            "id": "127.0.0.1:8080",
-            "name": "wangyunjing",
-            "person": [{"name": "www", "sex": "1"}, {"name": "www", "sex": "1"}]
-        },
+        instances: [],
+        paxos: {},
         showApplicationId: null,
 
         application: {},
@@ -209,20 +40,71 @@ var vm = new Vue({
         })
     },
     methods: {
-        // 初始化
+        // 初始化 OK
         initPage: function () {
-            // 判断是否为集群
+            this.getCloud();
+            if (this.cloud == true) {
+                this.refreshMaster();
+            }
+            this.refreshApplications();
         },
 
-        // 刷新master
+        // 获取是否为集群
+        getCloud: function () {
+            this.cloud = true;
+        },
+
+        // 刷新master OK
         refreshMaster: function () {
-
+            // 刷新Master
+            var vm = this;
+            vm.guardInstanceId = "";
+            vm.masterId = "-1";
+            $.ajax({
+                async: false,
+                url: "/paxos/is_master",
+                success: function (data) {
+                    vm.guardInstanceId = data["instanceId"];
+                    vm.masterId = data["master"];
+                    toastr.success("获取Master信息成功!");
+                },
+                error: function () {
+                    toastr.error("获取Master信息出错!");
+                }
+            });
+            vm.guardCloudInstances = [];
+            // 获取所有集群实例 /cloud/instances/list
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                return;
+            }
+            $.ajax({
+                url: "http://" + this.masterId + "/cloud/instances/list",
+                success: function (data) {
+                    vm.guardCloudInstances = data;
+                    toastr.success("获取Guard集群实例列表成功!");
+                },
+                error: function () {
+                    toastr.error("获取Guard集群实例列表出错!");
+                }
+            });
         },
 
-        // 显示Paxos信息
+        // 显示Paxos信息 OK
         showPaxosInfo: function (ip, port) {
-            this.paxos.ip = ip;
-            this.paxos.port = port;
+            this.paxos = {};
+            var vm = this;
+            $.ajax({
+                async: false,
+                url: "http://" + ip + ":" + port + "/paxos/is_master",
+                success: function (data) {
+                    vm.paxos = data;
+                    toastr.success("获取Paxos信息成功!");
+                },
+                error: function () {
+                    toastr.error("获取Paxos信息出错!");
+                }
+            });
             $('#paxosInfo').html(this.syntaxHighLight(this.paxos));
         },
         syntaxHighLight: function (json) {
@@ -248,33 +130,65 @@ var vm = new Vue({
         },
 
 
-        // 刷新应用列表
+        // 刷新应用列表 OK
         refreshApplications: function () {
-
+            this.applications = [];
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                return;
+            }
+            var vm = this;
+            $.ajax({
+                url: "http://" + this.masterId + "/applications/list",
+                success: function (data) {
+                    vm.applications = data;
+                    toastr.success("获取应用列表成功!");
+                },
+                error: function () {
+                    toastr.error("获取应用列表出错!");
+                }
+            });
         },
 
-        // 显示应用信息
+        // 显示应用信息 OK
         showApplicationInfo: function (applicationId) {
             if (applicationId == this.showApplicationId) {
                 this.showApplicationId = null;
                 return;
             }
-
             this.showApplicationId = applicationId;
+            this.refreshInstances(applicationId);
         },
 
-        // 添加应用
+        // 添加应用 OK
         addApplication: function () {
-            this.application={};
+            this.application = {};
         },
-        // 添加应用
+        // 添加应用 OK
         addApplicationAction: function () {
-
+            var vm = this;
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "http://" + vm.masterId + "/applications",
+                data: JSON.stringify(vm.application),
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("添加应用成功!");
+                },
+                error: function () {
+                    toastr.error("添加应用出错!");
+                },
+                complete: function () {
+                    vm.application = {};
+                }
+            });
+            this.refreshApplications();
         },
 
-        // 编辑应用信息
+        // 编辑应用信息 OK
         editApplication: function (applicationId) {
-            this.application={};
+            this.application = {};
             for (var i = 0; i < this.applications.length; i++) {
                 if (this.applications[i].applicationId == applicationId) {
                     for (var tmp in this.applications[i]) {
@@ -284,14 +198,31 @@ var vm = new Vue({
                 }
             }
         },
-        // 编辑应用信息
-        editApplicationAction: function () {
-
+        // 编辑应用信息 OK
+        editApplicationAction: function (applicationId) {
+            var vm = this;
+            $.ajax({
+                async: false,
+                type: "PUT",
+                url: "http://" + vm.masterId + "/applications/" + applicationId,
+                data: JSON.stringify(vm.application),
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("编辑应用成功!");
+                },
+                error: function () {
+                    toastr.error("编辑应用出错!");
+                },
+                complete: function () {
+                    vm.application = {};
+                }
+            });
+            this.refreshApplications();
         },
 
-        // 关闭应用
+        // 关闭应用 OK
         closeApplication: function (applicationId) {
-            this.application={};
+            this.application = {};
             for (var i = 0; i < this.applications.length; i++) {
                 if (this.applications[i].applicationId == applicationId) {
                     for (var tmp in this.applications[i]) {
@@ -301,14 +232,63 @@ var vm = new Vue({
                 }
             }
         },
-        // 关闭应用
-        closeApplicationAction: function () {
-
+        // 关闭应用 OK
+        closeApplicationAction: function (applicationId) {
+            var vm = this;
+            $.ajax({
+                async: false,
+                type: "PUT",
+                url: "http://" + vm.masterId + "/applications/" + applicationId + "/closure",
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("关闭应用成功!");
+                },
+                error: function () {
+                    toastr.error("关闭应用出错!");
+                },
+                complete: function () {
+                    vm.application = {};
+                }
+            });
+            this.refreshApplications();
         },
 
-        // 删除应用
+        // 启动应用 OK
+        startApplication: function (applicationId) {
+            this.application = {};
+            for (var i = 0; i < this.applications.length; i++) {
+                if (this.applications[i].applicationId == applicationId) {
+                    for (var tmp in this.applications[i]) {
+                        this.application[tmp] = this.applications[i][tmp];
+                    }
+                    return;
+                }
+            }
+        },
+        // 启动应用 OK
+        startApplicationAction: function (applicationId) {
+            var vm = this;
+            $.ajax({
+                async: false,
+                type: "PUT",
+                url: "http://" + vm.masterId + "/applications/" + applicationId + "/open",
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("启动应用成功!");
+                },
+                error: function () {
+                    toastr.error("启动应用出错!");
+                },
+                complete: function () {
+                    vm.application = {};
+                }
+            });
+            this.refreshApplications();
+        },
+
+        // 删除应用 OK
         deleteApplication: function (applicationId) {
-            this.application={};
+            this.application = {};
             for (var i = 0; i < this.applications.length; i++) {
                 if (this.applications[i].applicationId == applicationId) {
                     for (var tmp in this.applications[i]) {
@@ -318,19 +298,50 @@ var vm = new Vue({
                 }
             }
         },
-        // 删除应用
-        deleteApplicationAction: function () {
-
+        // 删除应用 OK
+        deleteApplicationAction: function (applicationId) {
+            var vm = this;
+            $.ajax({
+                async: false,
+                type: "DELETE",
+                url: "http://" + vm.masterId + "/applications/" + applicationId,
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("删除应用成功!");
+                },
+                error: function () {
+                    toastr.error("删除应用出错!");
+                },
+                complete: function () {
+                    vm.application = {};
+                }
+            });
+            this.refreshApplications();
         },
 
 
-        // 刷新实例列表
+        // 刷新实例列表 OK
         refreshInstances: function (applicationId) {
+            this.instances = [];
+            var vm = this;
+            $.ajax({
+                url: "http://" + this.masterId + "/instances/list",
+                data: {
+                    "applicationId": applicationId
+                },
+                success: function (data) {
+                    vm.instances = data;
+                    toastr.success("刷新实例列表成功!");
+                },
+                error: function () {
+                    toastr.error("刷新实例列表出错!");
+                }
+            });
         },
 
-        // 添加实例
+        // 添加实例 OK
         addInstance: function (applicationId) {
-            this.instance={};
+            this.instance = {};
             for (var i = 0; i < this.applications.length; i++) {
                 if (this.applications[i].applicationId == applicationId) {
                     for (var tmp in this.applications[i]) {
@@ -340,14 +351,31 @@ var vm = new Vue({
                 }
             }
         },
-        // 添加实例
-        addInstanceAction: function () {
-
+        // 添加实例 OK
+        addInstanceAction: function (applicationId) {
+            var vm = this;
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances",
+                data: JSON.stringify(vm.instance),
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("添加实例成功!");
+                },
+                error: function () {
+                    toastr.error("添加实例出错!");
+                },
+                complete: function () {
+                    vm.instance = {};
+                }
+            });
+            this.refreshInstances(applicationId);
         },
 
-        // 编辑实例信息
+        // 编辑实例信息 OK
         editInstance: function (instanceId) {
-            this.instance={};
+            this.instance = {};
             for (var i = 0; i < this.instances.length; i++) {
                 if (this.instances[i].instanceId == instanceId) {
                     for (var tmp in this.instances[i]) {
@@ -357,14 +385,32 @@ var vm = new Vue({
                 }
             }
         },
-        // 编辑实例信息
-        editInstanceAction: function () {
-
+        // 编辑实例信息 OK
+        editInstanceAction: function (instanceId) {
+            var vm = this;
+            var applicationId = vm.instance.applicationId;
+            $.ajax({
+                async: false,
+                type: "PUT",
+                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances?instanceId=" + instanceId,
+                data: JSON.stringify(vm.instance),
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("编辑实例成功!");
+                },
+                error: function () {
+                    toastr.error("编辑实例出错!");
+                },
+                complete: function () {
+                    vm.instance = {};
+                }
+            });
+            this.refreshInstances(applicationId);
         },
 
-        // 关闭实例
+        // 关闭实例 OK
         closeInstance: function (instanceId) {
-            this.instance={};
+            this.instance = {};
             for (var i = 0; i < this.instances.length; i++) {
                 if (this.instances[i].instanceId == instanceId) {
                     for (var tmp in this.instances[i]) {
@@ -374,14 +420,65 @@ var vm = new Vue({
                 }
             }
         },
-        // 关闭实例
-        closeInstanceAction: function () {
-
+        // 关闭实例 OK
+        closeInstanceAction: function (instanceId) {
+            var vm = this;
+            var applicationId = vm.instance.applicationId;
+            $.ajax({
+                async: false,
+                type: "PUT",
+                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances/closure?instanceId=" + instanceId,
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("关闭实例成功!");
+                },
+                error: function () {
+                    toastr.error("关闭实例出错!");
+                },
+                complete: function () {
+                    vm.instance = {};
+                }
+            });
+            this.refreshInstances(applicationId);
         },
 
-        // 删除实例
+        // 启动实例 OK
+        startInstance: function (instanceId) {
+            this.instance = {};
+            for (var i = 0; i < this.instances.length; i++) {
+                if (this.instances[i].instanceId == instanceId) {
+                    for (var tmp in this.instances[i]) {
+                        this.instance[tmp] = this.instances[i][tmp];
+                    }
+                    return;
+                }
+            }
+        },
+        // 启动实例 OK
+        startInstanceAction: function (instanceId) {
+            var vm = this;
+            var applicationId = vm.instance.applicationId;
+            $.ajax({
+                async: false,
+                type: "PUT",
+                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances/open?instanceId=" + instanceId,
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("启动实例成功!");
+                },
+                error: function () {
+                    toastr.error("启动实例出错!");
+                },
+                complete: function () {
+                    vm.instance = {};
+                }
+            });
+            this.refreshInstances(applicationId);
+        },
+
+        // 删除实例 OK
         deleteInstance: function (instanceId) {
-            this.instance={};
+            this.instance = {};
             for (var i = 0; i < this.instances.length; i++) {
                 if (this.instances[i].instanceId == instanceId) {
                     for (var tmp in this.instances[i]) {
@@ -391,9 +488,26 @@ var vm = new Vue({
                 }
             }
         },
-        // 删除实例
-        deleteInstanceAction: function () {
-
-        },
+        // 删除实例 OK
+        deleteInstanceAction: function (instanceId) {
+            var vm = this;
+            var applicationId = vm.instance.applicationId;
+            $.ajax({
+                async: false,
+                type: "DELETE",
+                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances?instanceId=" + instanceId,
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("启动实例成功!");
+                },
+                error: function () {
+                    toastr.error("启动实例出错!");
+                },
+                complete: function () {
+                    vm.instance = {};
+                }
+            });
+            this.refreshInstances(applicationId);
+        }
     }
 });
