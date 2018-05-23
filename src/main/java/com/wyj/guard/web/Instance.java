@@ -1,10 +1,16 @@
 package com.wyj.guard.web;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 public class Instance {
 
     /**
      * 所属应用的ID
      */
+    @NotNull(message = "应用ID不能为空")
     private Integer applicationId;
 
     // 所属应用名
@@ -14,38 +20,52 @@ public class Instance {
     private String instanceId;
 
     // ip地址
+    @NotEmpty(message = "IP不能为空")
     private String ip;
 
     // 应用启动端口号
+    @NotNull(message = "端口号不能为空")
     private Integer port;
 
     // 应用健康检查URL
+    @NotEmpty(message = "健康检测URI不能为空")
     private String healthUrl;
 
     // 权重（用于启动实例）
+    @NotNull(message = "权重不能为空")
     private Integer weight;
 
     // 启动命令
+    @NotEmpty(message = "启动命令不能为空")
     private String startCommand;
 
     // 远程服务器用户名
+    @NotEmpty(message = "用户名不能为空")
     private String username;
 
     // 远程服务器密码
+    @NotEmpty(message = "密码不能为空")
     private String password;
 
     // 心跳频率（毫秒）
+    @NotNull
+    @Min(2000)
     private Integer heartbeatRate;
 
     // 初始化实例时长
+    @NotNull
+    @Min(4000)
     private Integer initializeInstanceDuration;
 
     // 自我保护的时长（出现第一次down时开始计算）
+    @NotNull
+    @Min(6000)
     private Integer selfProtectedDuration;
 
     /**
      * 状态 {@link com.wyj.guard.share.enums.LaunchStatus}
      */
+    @NotNull
     private Short status;
 
     // 启动状态 {"虚拟关闭", "物理关闭", "启动中"}

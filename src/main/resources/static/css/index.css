@@ -1,0 +1,44 @@
+body {
+    padding-top: 50px;
+}
+
+.line-spacing {
+    margin-bottom: 10px;
+}
+
+/*json 格式化*/
+.string {
+    color: green;
+}
+
+.number {
+    color: darkorange;
+}
+
+.boolean {
+    color: blue;
+}
+
+.null {
+    color: magenta;
+}
+
+.key {
+    color: red;
+}
+
+.embedded-table {
+    margin-bottom: 100px;
+}
+
+.grey {
+    background-color: rgb(249,249,249);
+}
+
+.white {
+    background-color: white;
+}
+
+.footer {
+    margin-top: 100px;
+}

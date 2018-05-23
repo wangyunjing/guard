@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 public class InstanceController {
@@ -40,7 +41,7 @@ public class InstanceController {
     @PutMapping("/applications/{applicationId}/instances")
     public void updateInstance(@PathVariable("applicationId") Integer applicationId,
                                  @RequestParam("instanceId") String instanceId,
-                                 @RequestBody Instance instance) {
+                                 @RequestBody @Valid Instance instance) {
         instance.setApplicationId(applicationId);
         instance.setInstanceId(instanceId);
         context.getInstanceConfigLoader().updateInstance(instance);
@@ -49,7 +50,7 @@ public class InstanceController {
 
     @PostMapping("/applications/{applicationId}/instances")
     public boolean addInstance(@PathVariable("applicationId") Integer applicationId,
-                              @RequestBody Instance instance) {
+                              @RequestBody @Valid Instance instance) {
         instance.setApplicationId(applicationId);
         instance.setInstanceId(instance.getIp() + ":" + instance.getPort());
         InstanceConfig instanceConfig = context.getInstanceConfigLoader().addInstance(instance);

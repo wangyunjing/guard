@@ -1,11 +1,17 @@
 package com.wyj.guard.web;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 public class Application {
 
     // 应用Id
     private Integer applicationId;
 
     // 应用名称
+    @NotEmpty(message = "应用名不能为空")
     private String applicationName;
 
     // 默认启动端口号
@@ -18,6 +24,8 @@ public class Application {
     private String startCommand;
 
     // 启动实例的个数
+    @NotNull
+    @Min(1)
     private Integer startInstanceNum;
 
     // 默认远程服务器的用户名
@@ -27,15 +35,20 @@ public class Application {
     private String password;
 
     // 维护实例的周期
+    @NotNull(message = "维护实例的周期不能为空")
+    @Min(3000)
     private Integer defendInstanceDuration;
 
     // 默认心跳检查频率(毫秒)
+    @Min(2000)
     private Integer heartbeatRate;
 
     // 默认初始化实例时长(毫秒)
+    @Min(4000)
     private Integer initializeInstanceDuration;
 
     // 默认自我保护周期(毫秒)
+    @Min(6000)
     private Integer selfProtectedDuration;
 
     /**

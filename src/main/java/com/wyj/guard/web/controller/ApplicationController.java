@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 
 @RestController
@@ -39,7 +40,7 @@ public class ApplicationController {
     }
 
     @PostMapping("/applications")
-    public boolean addApplication(@RequestBody Application application) {
+    public boolean addApplication(@RequestBody @Valid Application application) {
         ApplicationConfig applicationConfig = context.getAppConfigLoader().addApplication(application);
         return endpoint.addApplication(applicationConfig);
     }
@@ -53,7 +54,7 @@ public class ApplicationController {
 
     @PutMapping("/applications/{applicationId}")
     public void updateApplication(@PathVariable("applicationId") Integer applicationId,
-                                  @RequestBody Application application) {
+                                  @RequestBody @Valid Application application) {
         application.setApplicationId(applicationId);
         context.getAppConfigLoader().updateApplication(application);
         managementEndpoint.refresh(applicationId, null);

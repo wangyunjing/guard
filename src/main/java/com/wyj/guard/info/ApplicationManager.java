@@ -449,10 +449,12 @@ public class ApplicationManager implements Closeable,
 
     @Override
     public InstanceInfo[] queryInstance(InstanceCondition condition) {
-        // TODO: 2018/5/13  根据条件查询实例信息
         List<InstanceInfo> instanceInfos = instanceManagerList.stream()
                 .map(instanceManager -> instanceManager.getInstanceInfo())
                 .collect(Collectors.toList());
+        if (condition != null && condition.getApplicationId() != null) {
+            instanceInfos.removeIf(instanceInfo -> !instanceInfo.getApplicationId().equals(condition.getApplicationId()));
+        }
         return instanceInfos.toArray(new InstanceInfo[instanceInfos.size()]);
     }
 
