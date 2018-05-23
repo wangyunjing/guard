@@ -63,7 +63,7 @@ public class Paxos implements Proposer, Acceptor, Lease {
         if (last != null) {
             map.put("master", last.getMaster());
         } else {
-            map.put("master", "");
+            map.put("master", "-1");
         }
         map.put("status", status);
         if (instanceId.equals(map.get("master"))) {

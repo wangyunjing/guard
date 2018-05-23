@@ -15,6 +15,7 @@ import com.wyj.guard.share.enums.InstanceStatus;
 import com.wyj.guard.share.enums.LaunchStatus;
 import com.wyj.guard.utils.DateTimeUtils;
 import com.wyj.guard.utils.ThreadPoolUtils;
+import com.wyj.guard.web.Instance;
 import com.wyj.guard.web.InstanceCondition;
 import com.wyj.guard.web.InstanceEndpoint;
 import org.slf4j.Logger;
@@ -448,14 +449,25 @@ public class ApplicationManager implements Closeable,
     }
 
     @Override
-    public InstanceInfo[] queryInstance(InstanceCondition condition) {
-        List<InstanceInfo> instanceInfos = instanceManagerList.stream()
-                .map(instanceManager -> instanceManager.getInstanceInfo())
-                .collect(Collectors.toList());
-        if (condition != null && condition.getApplicationId() != null) {
-            instanceInfos.removeIf(instanceInfo -> !instanceInfo.getApplicationId().equals(condition.getApplicationId()));
+    public Instance[] queryInstance(InstanceCondition condition) {
+        if (instanceManagerList == null) {
+            return new Instance[0];
         }
-        return instanceInfos.toArray(new InstanceInfo[instanceInfos.size()]);
+        List<Instance> instances = instanceManagerList.stream()
+                .map(instanceManager -> Instance.build(instanceManager))
+                .collect(Collectors.toList());
+
+        if (condition != null && condition.getApplicationId() != null) {
+            instances.removeIf(instanceInfo -> !instanceInfo.getApplicationId().equals(condition.getApplicationId()));
+        }
+        instances.forEach(instance -> {
+            if (startedInstances.contains(instance.getInstanceId())) {
+                instance.setLaunchStatus((short) 1);
+            } else {
+                instance.setLaunchStatus((short) 0);
+            }
+        });
+        return instances.toArray(new Instance[instances.size()]);
     }
 
     @Override

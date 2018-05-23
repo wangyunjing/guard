@@ -28,7 +28,7 @@ public class InstanceController {
     InstanceEndpoint instanceEndpoint;
 
     @GetMapping("/instances/list")
-    public InstanceInfo[] getInstance(InstanceCondition condition) {
+    public Instance[] getInstance(InstanceCondition condition) {
         return instanceEndpoint.queryInstance(condition);
     }
 

@@ -18,7 +18,7 @@ public interface InstanceEndpoint {
     /**
      * 查询实例
      */
-    InstanceInfo[] queryInstance(InstanceCondition condition);
+    Instance[] queryInstance(InstanceCondition condition);
 
     /**
      * 获取实例

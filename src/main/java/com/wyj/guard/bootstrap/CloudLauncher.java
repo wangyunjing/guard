@@ -112,7 +112,7 @@ public class CloudLauncher extends AbstractLauncher implements Acceptor, Lease {
         InstanceCondition condition = new InstanceCondition();
         condition.setApplicationId(guardProperties.getClusterApplicationId());
         return Arrays.stream(cloudManager.queryInstance(condition))
-                .map(instanceInfo -> instanceInfo.getInstanceId())
+                .map(instance -> instance.getInstanceId())
                 .collect(Collectors.toList());
     }
 

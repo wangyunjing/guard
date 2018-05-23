@@ -1,5 +1,8 @@
 package com.wyj.guard.web;
 
+import com.wyj.guard.info.ApplicationInfo;
+import com.wyj.guard.info.ApplicationManager;
+import com.wyj.guard.info.config.ApplicationConfig;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Min;
@@ -57,7 +60,31 @@ public class Application {
     private Short status;
 
     // 启动状态 {"虚拟关闭", "物理关闭", "启动中"}
-    private String launchStatus;
+    private Short launchStatus;
+
+    public static Application build(ApplicationManager applicationManager) {
+        ApplicationConfig applicationConfig = applicationManager.getApplicationInfo();
+        Application application = new Application();
+        application.setApplicationId(applicationConfig.getApplicationId());
+        application.setApplicationName(applicationConfig.getApplicationName());
+        application.setPort(applicationConfig.getDefaultPort());
+        application.setHealthUrl(applicationConfig.getDefaultHealthUrl());
+        application.setStartCommand(applicationConfig.getDefaultStartCommand());
+        application.setStartInstanceNum(applicationConfig.getStartInstanceNum());
+        application.setUsername(applicationConfig.getDefaultUsername());
+        application.setPassword(applicationConfig.getDefaultPassword());
+        application.setDefendInstanceDuration(applicationConfig.getDefendInstanceDuration());
+        application.setHeartbeatRate(applicationConfig.getDefaultHeartbeatRate());
+        application.setInitializeInstanceDuration(applicationConfig.getDefaultInitializeInstanceDuration());
+        application.setSelfProtectedDuration(applicationConfig.getDefaultSelfProtectedDuration());
+        application.setStatus(applicationConfig.getStatus().status);
+        if (applicationManager.isVirtualClosed() || applicationManager.isPhysicalClosed()) {
+            application.setLaunchStatus((short) 0);
+        } else {
+            application.setLaunchStatus((short) 1);
+        }
+        return application;
+    }
 
     public Integer getApplicationId() {
         return applicationId;
@@ -163,11 +190,11 @@ public class Application {
         this.status = status;
     }
 
-    public String getLaunchStatus() {
+    public Short getLaunchStatus() {
         return launchStatus;
     }
 
-    public void setLaunchStatus(String launchStatus) {
+    public void setLaunchStatus(Short launchStatus) {
         this.launchStatus = launchStatus;
     }
 }

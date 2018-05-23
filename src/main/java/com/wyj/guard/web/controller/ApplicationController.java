@@ -4,7 +4,6 @@ import com.wyj.guard.context.GuardContext;
 import com.wyj.guard.info.ApplicationInfo;
 import com.wyj.guard.info.config.ApplicationConfig;
 import com.wyj.guard.info.config.ConfigurableApplicationConfig;
-import com.wyj.guard.info.config.ConfigurableInstanceConfig;
 import com.wyj.guard.share.enums.LaunchStatus;
 import com.wyj.guard.web.Application;
 import com.wyj.guard.web.ApplicationCondition;
@@ -15,7 +14,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
 
 @RestController
 public class ApplicationController {
@@ -30,7 +28,7 @@ public class ApplicationController {
     ApplicationEndpoint endpoint;
 
     @GetMapping("/applications/list")
-    public ApplicationInfo[] getApplication(ApplicationCondition condition) {
+    public Application[] getApplication(ApplicationCondition condition) {
         return endpoint.queryApplication(condition);
     }
 

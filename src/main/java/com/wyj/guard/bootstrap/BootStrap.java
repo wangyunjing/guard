@@ -141,7 +141,7 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
     }
 
     @Override
-    public ApplicationInfo[] queryApplication(ApplicationCondition condition) {
+    public Application[] queryApplication(ApplicationCondition condition) {
         return launcher.queryApplication(condition);
     }
 
@@ -176,7 +176,7 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
     }
 
     @Override
-    public InstanceInfo[] queryInstance(InstanceCondition condition) {
+    public Instance[] queryInstance(InstanceCondition condition) {
         return launcher.queryInstance(condition);
     }
 

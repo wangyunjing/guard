@@ -1,5 +1,7 @@
 package com.wyj.guard.web;
 
+import com.wyj.guard.info.InstanceInfo;
+import com.wyj.guard.info.InstanceManager;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Min;
@@ -69,7 +71,32 @@ public class Instance {
     private Short status;
 
     // 启动状态 {"虚拟关闭", "物理关闭", "启动中"}
-    private String launchStatus;
+    private Short launchStatus;
+
+    public static Instance build(InstanceManager instanceManager) {
+        Instance instance = new Instance();
+        InstanceInfo instanceInfo = instanceManager.getInstanceInfo();
+        instance.setApplicationId(instanceInfo.getApplicationId());
+        instance.setApplicationName(instanceInfo.getApplicationName());
+        instance.setInstanceId(instanceInfo.getInstanceId());
+        instance.setIp(instanceInfo.getIp());
+        instance.setPort(instanceInfo.getPort());
+        instance.setHealthUrl(instanceInfo.getHealthUrl());
+        instance.setWeight(instanceInfo.getWeight());
+        instance.setStartCommand(instanceInfo.getStartCommand());
+        instance.setUsername(instanceInfo.getUsername());
+        instance.setPassword(instanceInfo.getPassword());
+        instance.setHeartbeatRate(instanceInfo.getHeartbeatRate());
+        instance.setInitializeInstanceDuration(instanceInfo.getInitializeInstanceDuration());
+        instance.setSelfProtectedDuration(instanceInfo.getSelfProtectedDuration());
+        instance.setStatus(instanceInfo.getStatus().status);
+        if (instanceManager.isVirtualClosed() || instanceManager.isPhysicalClosed()) {
+            instance.setLaunchStatus((short) 0);
+        } else {
+            instance.setLaunchStatus((short) 1);
+        }
+        return instance;
+    }
 
     public Integer getApplicationId() {
         return applicationId;
@@ -183,11 +210,11 @@ public class Instance {
         this.status = status;
     }
 
-    public String getLaunchStatus() {
+    public Short getLaunchStatus() {
         return launchStatus;
     }
 
-    public void setLaunchStatus(String launchStatus) {
+    public void setLaunchStatus(Short launchStatus) {
         this.launchStatus = launchStatus;
     }
 }

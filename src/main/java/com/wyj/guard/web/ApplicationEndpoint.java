@@ -18,7 +18,7 @@ public interface ApplicationEndpoint {
     /**
      * 查询应用
      */
-    ApplicationInfo[] queryApplication(ApplicationCondition condition);
+    Application[] queryApplication(ApplicationCondition condition);
 
     /**
      * 获取应用

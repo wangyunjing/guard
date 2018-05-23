@@ -8,6 +8,7 @@ import com.wyj.guard.info.ApplicationManager;
 import com.wyj.guard.info.InstanceInfo;
 import com.wyj.guard.info.config.ApplicationConfig;
 import com.wyj.guard.info.config.InstanceConfig;
+import com.wyj.guard.share.Pair;
 import com.wyj.guard.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,17 +172,27 @@ public abstract class AbstractLauncher implements Launcher, GuardManagementEndpo
     }
 
     @Override
-    public ApplicationInfo[] queryApplication(ApplicationCondition condition) {
-        // TODO: 2018/5/11
-        return new ApplicationInfo[0];
+    public Application[] queryApplication(ApplicationCondition condition) {
+        // TODO: 2018/5/23 暂时没有条件的判断
+        if (applicationManagers == null) {
+            return new Application[0];
+        }
+        List<Application> applications = applicationManagers.stream()
+                .map(applicationManager -> Application.build(applicationManager))
+                .collect(Collectors.toList());
+
+        return applications.toArray(new Application[applications.size()]);
     }
 
     @Override
-    public InstanceInfo[] queryInstance(InstanceCondition condition) {
-        List<InstanceInfo> instanceInfos = applicationManagers.stream()
+    public Instance[] queryInstance(InstanceCondition condition) {
+        if (applicationManagers == null) {
+            return new Instance[0];
+        }
+        List<Instance> instances = applicationManagers.stream()
                 .flatMap(applicationManager -> Arrays.stream(applicationManager.queryInstance(condition)))
                 .collect(Collectors.toList());
-        return instanceInfos.toArray(new InstanceInfo[instanceInfos.size()]);
+        return instances.toArray(new Instance[instances.size()]);
     }
 
     @Override
