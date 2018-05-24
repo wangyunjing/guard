@@ -51,7 +51,18 @@ var vm = new Vue({
 
         // 获取是否为集群
         getCloud: function () {
-            this.cloud = true;
+            var vm = this;
+            $.ajax({
+                async: false,
+                url: "/guard/is_cloud",
+                success: function (data) {
+                    vm.cloud = data;
+                    toastr.success("获取是否为集群成功!");
+                },
+                error: function () {
+                    toastr.error("获取是否为集群出错!");
+                }
+            });
         },
 
         // 刷新master OK
@@ -66,6 +77,9 @@ var vm = new Vue({
                 success: function (data) {
                     vm.guardInstanceId = data["instanceId"];
                     vm.masterId = data["master"];
+                    if (vm.masterId == null) {
+                        vm.masterId = "-1";
+                    }
                     toastr.success("获取Master信息成功!");
                 },
                 error: function () {
@@ -129,7 +143,73 @@ var vm = new Vue({
             });
         },
 
+        // 关闭所有应用
+        closeAllApplications: function () {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                return;
+            }
+            var vm = this;
+            $.ajax({
+                async: false,
+                type: "PUT",
+                url: vm.getUrlPrefix() + "/guard/closure",
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("关闭所有应用成功!");
+                },
+                error: function () {
+                    toastr.error("关闭所有应用出错!");
+                }
+            });
+            this.refreshApplications();
+        },
 
+        // 启动所有应用
+        startAllApplications: function () {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                return;
+            }
+            var vm = this;
+            $.ajax({
+                async: false,
+                type: "PUT",
+                url: vm.getUrlPrefix() + "/guard/open",
+                contentType: "application/json;charset=UTF-8",
+                success: function () {
+                    toastr.success("启动所有应用成功!");
+                },
+                error: function () {
+                    toastr.error("启动所有应用出错!");
+                }
+            });
+            this.refreshApplications();
+        },
+
+        // 刷新配置
+        refreshConfig: function (applicationId, instanceId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                return;
+            }
+            var vm = this;
+            $.ajax({
+                type: "POST",
+                url: vm.getUrlPrefix() + "/guard/refresh",
+                data: {
+                    "applicationId": applicationId,
+                    "instanceId": instanceId
+                },
+                success: function () {
+                    toastr.success("刷新配置成功!");
+                },
+                error: function () {
+                    toastr.error("刷新配置出错!");
+                }
+            });
+        },
+        
         // 刷新应用列表 OK
         refreshApplications: function () {
             this.applications = [];
@@ -139,7 +219,8 @@ var vm = new Vue({
             }
             var vm = this;
             $.ajax({
-                url: "http://" + this.masterId + "/applications/list",
+                // url: "http://" + this.masterId + "/applications/list",
+                url: vm.getUrlPrefix() + "/applications/list",
                 success: function (data) {
                     vm.applications = data;
                     toastr.success("获取应用列表成功!");
@@ -166,11 +247,16 @@ var vm = new Vue({
         },
         // 添加应用 OK
         addApplicationAction: function () {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.application = {};
+                return;
+            }
             var vm = this;
             $.ajax({
                 async: false,
                 type: "POST",
-                url: "http://" + vm.masterId + "/applications",
+                url: vm.getUrlPrefix() + "/applications",
                 data: JSON.stringify(vm.application),
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
@@ -200,11 +286,17 @@ var vm = new Vue({
         },
         // 编辑应用信息 OK
         editApplicationAction: function (applicationId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.application = {};
+                return;
+            }
             var vm = this;
             $.ajax({
                 async: false,
                 type: "PUT",
-                url: "http://" + vm.masterId + "/applications/" + applicationId,
+                // url: "http://" + vm.masterId + "/applications/" + applicationId,
+                url: vm.getUrlPrefix() + "/applications/" + applicationId,
                 data: JSON.stringify(vm.application),
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
@@ -234,11 +326,17 @@ var vm = new Vue({
         },
         // 关闭应用 OK
         closeApplicationAction: function (applicationId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.application = {};
+                return;
+            }
             var vm = this;
             $.ajax({
                 async: false,
                 type: "PUT",
-                url: "http://" + vm.masterId + "/applications/" + applicationId + "/closure",
+                // url: "http://" + vm.masterId + "/applications/" + applicationId + "/closure",
+                url: vm.getUrlPrefix() + "/applications/" + applicationId + "/closure",
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
                     toastr.success("关闭应用成功!");
@@ -267,11 +365,17 @@ var vm = new Vue({
         },
         // 启动应用 OK
         startApplicationAction: function (applicationId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.application = {};
+                return;
+            }
             var vm = this;
             $.ajax({
                 async: false,
                 type: "PUT",
-                url: "http://" + vm.masterId + "/applications/" + applicationId + "/open",
+                // url: "http://" + vm.masterId + "/applications/" + applicationId + "/open",
+                url: vm.getUrlPrefix() + "/applications/" + applicationId + "/open",
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
                     toastr.success("启动应用成功!");
@@ -300,11 +404,17 @@ var vm = new Vue({
         },
         // 删除应用 OK
         deleteApplicationAction: function (applicationId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.application = {};
+                return;
+            }
             var vm = this;
             $.ajax({
                 async: false,
                 type: "DELETE",
-                url: "http://" + vm.masterId + "/applications/" + applicationId,
+                // url: "http://" + vm.masterId + "/applications/" + applicationId,
+                url: vm.getUrlPrefix() + "/applications/" + applicationId,
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
                     toastr.success("删除应用成功!");
@@ -323,9 +433,14 @@ var vm = new Vue({
         // 刷新实例列表 OK
         refreshInstances: function (applicationId) {
             this.instances = [];
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                return;
+            }
             var vm = this;
             $.ajax({
-                url: "http://" + this.masterId + "/instances/list",
+                // url: "http://" + this.masterId + "/instances/list",
+                url: vm.getUrlPrefix() + "/instances/list",
                 data: {
                     "applicationId": applicationId
                 },
@@ -353,11 +468,17 @@ var vm = new Vue({
         },
         // 添加实例 OK
         addInstanceAction: function (applicationId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.instance = {};
+                return;
+            }
             var vm = this;
             $.ajax({
                 async: false,
                 type: "POST",
-                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances",
+                // url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances",
+                url: vm.getUrlPrefix() + "/applications/" + applicationId + "/instances",
                 data: JSON.stringify(vm.instance),
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
@@ -387,12 +508,18 @@ var vm = new Vue({
         },
         // 编辑实例信息 OK
         editInstanceAction: function (instanceId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.instance = {};
+                return;
+            }
             var vm = this;
             var applicationId = vm.instance.applicationId;
             $.ajax({
                 async: false,
                 type: "PUT",
-                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances?instanceId=" + instanceId,
+                // url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances?instanceId=" + instanceId,
+                url: vm.getUrlPrefix() + "/applications/" + applicationId + "/instances?instanceId=" + instanceId,
                 data: JSON.stringify(vm.instance),
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
@@ -422,12 +549,18 @@ var vm = new Vue({
         },
         // 关闭实例 OK
         closeInstanceAction: function (instanceId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.instance = {};
+                return;
+            }
             var vm = this;
             var applicationId = vm.instance.applicationId;
             $.ajax({
                 async: false,
                 type: "PUT",
-                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances/closure?instanceId=" + instanceId,
+                // url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances/closure?instanceId=" + instanceId,
+                url: vm.getUrlPrefix() + "/applications/" + applicationId + "/instances/closure?instanceId=" + instanceId,
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
                     toastr.success("关闭实例成功!");
@@ -456,12 +589,18 @@ var vm = new Vue({
         },
         // 启动实例 OK
         startInstanceAction: function (instanceId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.instance = {};
+                return;
+            }
             var vm = this;
             var applicationId = vm.instance.applicationId;
             $.ajax({
                 async: false,
                 type: "PUT",
-                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances/open?instanceId=" + instanceId,
+                // url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances/open?instanceId=" + instanceId,
+                url: vm.getUrlPrefix() + "/applications/" + applicationId + "/instances/open?instanceId=" + instanceId,
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
                     toastr.success("启动实例成功!");
@@ -490,12 +629,18 @@ var vm = new Vue({
         },
         // 删除实例 OK
         deleteInstanceAction: function (instanceId) {
+            if (this.cloud == true && this.masterId == "-1") {
+                toastr.warning("Master节点不存在!");
+                this.instance = {};
+                return;
+            }
             var vm = this;
             var applicationId = vm.instance.applicationId;
             $.ajax({
                 async: false,
                 type: "DELETE",
-                url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances?instanceId=" + instanceId,
+                // url: "http://" + vm.masterId + "/applications/" + applicationId + "/instances?instanceId=" + instanceId,
+                url: vm.getUrlPrefix() + "/applications/" + applicationId + "/instances?instanceId=" + instanceId,
                 contentType: "application/json;charset=UTF-8",
                 success: function () {
                     toastr.success("启动实例成功!");
@@ -508,6 +653,13 @@ var vm = new Vue({
                 }
             });
             this.refreshInstances(applicationId);
+        },
+
+        getUrlPrefix: function () {
+            if (this.masterId == "-1") {
+                return "";
+            }
+            return "http://" + this.masterId;
         }
     }
 });

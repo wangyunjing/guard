@@ -12,14 +12,14 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Guard管理界面</a>
+                <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>&nbsp;&nbsp;Guard管理界面</a>
             </div>
         </div>
     </nav>
     <div class="container-fluid">
         <div v-if="cloud == true">
             <div class="page-header">
-                <h1>Guard集群</h1>
+                <h1><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>&nbsp;&nbsp;Guard集群</h1>
             </div>
             <div class="well">
                 <h4>Guard实例：<span class="label label-primary">{{guardInstanceId}}</span></h4>
@@ -79,7 +79,7 @@
         </div>
 
         <div class="page-header">
-            <h1>应用列表</h1>
+            <h1><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>&nbsp;&nbsp;应用列表</h1>
         </div>
         <div class="line-spacing pull-left">
             <button type="button" class="btn btn-default" @click="addApplication()"
@@ -92,6 +92,22 @@
                 <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>&nbsp;应用列表
             </button>
         </div>
+        <div class="line-spacing pull-right">
+            <button type="button" class="btn btn-default" @click="refreshConfig()">
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>&nbsp;所有应用配置
+            </button>
+        </div>
+        <div class="line-spacing pull-right">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#closeAllApplicationModal">
+                <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>&nbsp;关闭所有应用
+            </button>
+        </div>
+        <div class="line-spacing pull-right">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#startAllApplicationModal">
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>&nbsp;启动所有应用
+            </button>
+        </div>
+
 
         <table class="table table-hover">
             <thead>
@@ -131,17 +147,40 @@
                 <td>{{application.launchStatus}}</td>
                 <td>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-info"
-                                @click="showApplicationInfo(application.applicationId)">详情
+                        <!--详情-->
+                        <button type="button" class="btn btn-default" @click="showApplicationInfo(application.applicationId)"
+                                data-toggle="tooltip" data-placement="top" title="所有实例信息">
+                            <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                         </button>
-                        <button type="button" class="btn btn-warning" @click="editApplication(application.applicationId)"
-                                data-toggle="modal" data-target="#editApplicationModal">编辑</button>
-                        <button type="button" class="btn btn-danger" @click="closeApplication(application.applicationId)"
-                                data-toggle="modal" data-target="#closeApplicationModal" v-if="application.status == 1">关闭</button>
-                        <button type="button" class="btn btn-danger" @click="startApplication(application.applicationId)"
-                                data-toggle="modal" data-target="#startApplicationModal" v-if="application.status == 0">启动</button>
-                        <button type="button" class="btn btn-danger" @click="deleteApplication(application.applicationId)"
-                                data-toggle="modal" data-target="#deleteApplicationModal">删除</button>
+                        <!--编辑-->
+                        <button type="button" class="btn btn-default" @click="editApplication(application.applicationId)"
+                                data-toggle="modal" data-target="#editApplicationModal"
+                                data-toggle="tooltip" data-placement="top" title="编辑应用">
+                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                        </button>
+                        <!--刷新配置-->
+                        <button type="button" class="btn btn-default" @click="refreshConfig(application.applicationId)"
+                                data-toggle="tooltip" data-placement="top" title="刷新应用配置">
+                            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                        </button>
+                        <!--关闭-->
+                        <button type="button" class="btn btn-default" @click="closeApplication(application.applicationId)"
+                                data-toggle="modal" data-target="#closeApplicationModal" v-if="application.status == 1"
+                                data-toggle="tooltip" data-placement="top" title="关闭应用">
+                            <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                        </button>
+                        <!--启动-->
+                        <button type="button" class="btn btn-default" @click="startApplication(application.applicationId)"
+                                data-toggle="modal" data-target="#startApplicationModal" v-if="application.status == 0"
+                                data-toggle="tooltip" data-placement="top" title="启动应用">
+                            <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                        </button>
+                        <!--删除-->
+                        <button type="button" class="btn btn-default" @click="deleteApplication(application.applicationId)"
+                                data-toggle="modal" data-target="#deleteApplicationModal"
+                                data-toggle="tooltip" data-placement="top" title="删除应用">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -197,14 +236,35 @@
                             <td>{{instance.launchStatus}}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-warning" @click="editInstance(instance.instanceId)"
-                                            data-toggle="modal" data-target="#editInstanceModal">编辑</button>
-                                    <button type="button" class="btn btn-danger" @click="closeInstance(instance.instanceId)"
-                                            data-toggle="modal" data-target="#closeInstanceModal" v-if="instance.status == 1">关闭</button>
-                                    <button type="button" class="btn btn-danger" @click="startInstance(instance.instanceId)"
-                                            data-toggle="modal" data-target="#startInstanceModal" v-if="instance.status == 0">启动</button>
-                                    <button type="button" class="btn btn-danger" @click="deleteInstance(instance.instanceId)"
-                                            data-toggle="modal" data-target="#deleteInstanceModal">删除</button>
+                                    <!--编辑-->
+                                    <button type="button" class="btn btn-default" @click="editInstance(instance.instanceId)"
+                                            data-toggle="modal" data-target="#editInstanceModal"
+                                            data-toggle="tooltip" data-placement="top" title="编辑实例">
+                                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <!--刷新配置-->
+                                    <button type="button" class="btn btn-default" @click="refreshConfig(instance.applicationId, instance.instanceId)"
+                                            data-toggle="tooltip" data-placement="top" title="刷新实例配置">
+                                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                                    </button>
+                                    <!--关闭-->
+                                    <button type="button" class="btn btn-default" @click="closeInstance(instance.instanceId)"
+                                            data-toggle="modal" data-target="#closeInstanceModal" v-if="instance.status == 1"
+                                            data-toggle="tooltip" data-placement="top" title="关闭实例">
+                                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                                    </button>
+                                    <!--启动-->
+                                    <button type="button" class="btn btn-default" @click="startInstance(instance.instanceId)"
+                                            data-toggle="modal" data-target="#startInstanceModal" v-if="instance.status == 0"
+                                            data-toggle="tooltip" data-placement="top" title="启动实例">
+                                        <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                                    </button>
+                                    <!--删除-->
+                                    <button type="button" class="btn btn-default" @click="deleteInstance(instance.instanceId)"
+                                            data-toggle="modal" data-target="#deleteInstanceModal"
+                                            data-toggle="tooltip" data-placement="top" title="删除实例">
+                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -221,6 +281,49 @@
     <div class="footer">
     </div>
     <!-- Modal -->
+    <div class="modal fade" id="closeAllApplicationModal" tabindex="-1" role="dialog" aria-labelledby="closeAllApplicationLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="closeAllApplicationLabel">关闭所有应用</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <h2>你确定要关闭所有应用吗?</h2>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @click="closeAllApplications()">Definite</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="startAllApplicationModal" tabindex="-1" role="dialog" aria-labelledby="startAllApplicationLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="startAllApplicationLabel">启动所有应用</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <h2>你确定要启动所有应用吗?</h2>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @click="startAllApplications()">Definite</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal fade" id="paxosInfoModal" tabindex="-1" role="dialog" aria-labelledby="paxosInfoLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -584,7 +687,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="editInstanceLabel">编辑应用</h4>
+                    <h4 class="modal-title" id="editInstanceLabel">编辑实例</h4>
                 </div>
                 <div class="modal-body">
                     <div class="input-group">
