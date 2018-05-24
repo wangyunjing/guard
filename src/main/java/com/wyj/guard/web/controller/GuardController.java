@@ -39,6 +39,10 @@ public class GuardController {
             for (ApplicationConfig applicationConfig : applicationConfigs) {
                 if (applicationConfig != null) {
                     if (applicationConfig instanceof ConfigurableApplicationConfig) {
+                        if (guardProperties.isWhetherCluster() &&
+                                applicationConfig.getApplicationId().equals(guardProperties.getClusterApplicationId())) {
+                            continue;
+                        }
                         ConfigurableApplicationConfig configurableApplicationConfig = (ConfigurableApplicationConfig) applicationConfig;
                         configurableApplicationConfig.setStatus(LaunchStatus.SHUTDOWN);
                     }
@@ -55,6 +59,10 @@ public class GuardController {
             for (ApplicationConfig applicationConfig : applicationConfigs) {
                 if (applicationConfig != null) {
                     if (applicationConfig instanceof ConfigurableApplicationConfig) {
+                        if (guardProperties.isWhetherCluster() &&
+                                applicationConfig.getApplicationId().equals(guardProperties.getClusterApplicationId())) {
+                            continue;
+                        }
                         ConfigurableApplicationConfig configurableApplicationConfig = (ConfigurableApplicationConfig) applicationConfig;
                         configurableApplicationConfig.setStatus(LaunchStatus.UP);
                     }
