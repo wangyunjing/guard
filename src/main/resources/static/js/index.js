@@ -213,6 +213,8 @@ var vm = new Vue({
         // 刷新应用列表 OK
         refreshApplications: function () {
             this.applications = [];
+            this.showApplicationId = null;
+            this.instances = [];
             if (this.cloud == true && this.masterId == "-1") {
                 toastr.warning("Master节点不存在!");
                 return;
