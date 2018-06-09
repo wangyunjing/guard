@@ -14,29 +14,30 @@ import java.util.function.Function;
 
 public interface ConfigurableGuardContext extends GuardContext {
 
+    // 设置环境变量
     void setEnvironment(Environment environment);
 
+    // 设置系统配置
     void setGuardProperties(GuardProperties guardProperties);
 
-//    void setRedisTemplate(RedisTemplate redisTemplate);
-
+    // 设置远程连接工具
     void setSSHClient(SSHClient sshClient);
 
+    // 设置实例信息生成器
     void setInstanceInfoSupplier(Function<InstanceConfig, InstanceInfo> supplier);
 
+    // 设置应用信息生成器
     void setApplicationInfoSupplier(Function<ApplicationConfig, ApplicationInfo> supplier);
 
+    // 设置应用配置加载器
     void setAppConfigLoader(AppConfigLoader appConfigLoader);
 
+    // 设置实例配置加载器
     void setInstanceConfigLoader(InstanceConfigLoader instanceConfigLoader);
 
+    // 添加应用监听器
     void addApplicationListener(ApplicationListener<?> listener);
 
+    // 移除应用监听器
     void removeApplicationListener(ApplicationListener<?> listener);
-
-//    void addRefreshableConfig(Refreshable refreshableConfig);
-//
-//    void addRefreshableConfigs(Refreshable[] refreshableConfigs);
-//
-//    void setRefreshableConfigs(Refreshable[] refreshableConfigs);
 }

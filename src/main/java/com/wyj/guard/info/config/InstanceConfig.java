@@ -25,6 +25,7 @@ public interface InstanceConfig {
     // 实例启动的命令
     String getStartCommand();
 
+    // 健康检测URL
     String getHealthUrl();
 
     // 权重

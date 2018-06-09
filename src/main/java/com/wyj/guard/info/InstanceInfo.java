@@ -20,19 +20,19 @@ public class InstanceInfo implements InstanceConfig {
     // 应用ID
     private Integer applicationId;
 
-    // 所属应用名
+    // 应用名
     private String applicationName;
 
-    // 实例名
+    // 实例ID
     private String instanceId;
 
     // ip地址
     private String ip;
 
-    // 应用启动端口号
+    // 实例启动端口号
     private Integer port;
 
-    // 应用健康检查URL
+    // 实例健康检查URL
     private String healthUrl;
 
     // 权重（用于启动实例）
@@ -56,6 +56,7 @@ public class InstanceInfo implements InstanceConfig {
     // 自我保护的时长（出现第一次down时开始计算）
     private Integer selfProtectedDuration;
 
+    // 状态
     private LaunchStatus status;
 
     public static class Builder{

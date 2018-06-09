@@ -37,6 +37,7 @@ public class ApplicationInfo implements ApplicationConfig{
     // 默认远程服务器的密码
     private String password;
 
+    // 维护实例周期(毫秒)
     private Integer defendInstanceDuration;
 
     // 默认心跳检查频率(毫秒)

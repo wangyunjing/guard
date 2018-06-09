@@ -28,7 +28,7 @@ public interface ConfigurableInstanceConfig extends InstanceConfig {
     // 设置初始化实例周期
     void setInitializeInstanceDuration(Integer duration);
 
-    //设置自我保护的周期
+    // 设置自我保护的周期
     void setSelfProtectedDuration(Integer duration);
 
     // 设置状态

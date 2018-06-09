@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("guard.datasource")
 public class DataSourceProperties {
 
-    private String url = "jdbc:mysql://localhost:3306/process_scheduling?useUnicode=true&characterEncoding=UTF8&useSSL=false";
+    private String url = "jdbc:mysql://localhost:3306/guard?useUnicode=true&characterEncoding=UTF8&useSSL=false";
 
     private String username = "root";
 
