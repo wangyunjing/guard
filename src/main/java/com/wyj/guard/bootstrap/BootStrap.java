@@ -94,9 +94,12 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
                 throw new RuntimeException("集群的应用ID不能为空");
             }
             ApplicationConfig applicationConfig = guardContext.getAppConfigLoader().load(guardProperties.getClusterApplicationId());
-            if (applicationConfig.getStatus().equals(LaunchStatus.SHUTDOWN)) {
+            LaunchStatus status = applicationConfig.getStatus();
+            logger.info("启动模式为集群模式, 集群的启动状态为{}", status);
+            if (status.equals(LaunchStatus.SHUTDOWN)) {
                 if (applicationConfig instanceof ConfigurableApplicationConfig) {
                     ConfigurableApplicationConfig.class.cast(applicationConfig).setStatus(LaunchStatus.UP);
+                    logger.info("启动模式为集群模式, 更改集群的启动状态为 UP");
                 } else {
                     throw new RuntimeException("启动模式为集群模式，集群的启动状态必须为UP(1)");
                 }
@@ -105,9 +108,12 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
         } else {
             if (guardProperties.getClusterApplicationId() != null) {
                 ApplicationConfig applicationConfig = guardContext.getAppConfigLoader().load(guardProperties.getClusterApplicationId());
-                if (applicationConfig.getStatus().equals(LaunchStatus.UP)) {
+                LaunchStatus status = applicationConfig.getStatus();
+                logger.info("启动模式为单例模式, 集群的启动状态为{}", status);
+                if (status.equals(LaunchStatus.UP)) {
                     if (applicationConfig instanceof ConfigurableApplicationConfig) {
                         ConfigurableApplicationConfig.class.cast(applicationConfig).setStatus(LaunchStatus.SHUTDOWN);
+                        logger.info("启动模式为单例模式, 更改集群的启动状态为 SHUTDOWN");
                     } else {
                         throw new RuntimeException("启动模式为单例模式，集群的启动状态必须为SHUTDOWN(0)");
                     }
