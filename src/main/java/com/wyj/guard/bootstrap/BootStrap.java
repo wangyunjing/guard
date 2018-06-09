@@ -12,6 +12,7 @@ import com.wyj.guard.info.ApplicationInfoSupplier;
 import com.wyj.guard.info.InstanceInfo;
 import com.wyj.guard.info.InstanceInfoSupplier;
 import com.wyj.guard.info.config.ApplicationConfig;
+import com.wyj.guard.info.config.ConfigurableApplicationConfig;
 import com.wyj.guard.info.config.InstanceConfig;
 import com.wyj.guard.info.loader.AppConfigLoader;
 import com.wyj.guard.info.loader.DBAppConfigLoader;
@@ -19,6 +20,7 @@ import com.wyj.guard.info.loader.DBInstanceConfigLoader;
 import com.wyj.guard.info.loader.InstanceConfigLoader;
 import com.wyj.guard.remote.JSCHClient;
 import com.wyj.guard.remote.SSHClient;
+import com.wyj.guard.share.enums.LaunchStatus;
 import com.wyj.guard.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,8 +90,29 @@ public class BootStrap implements GuardContext, GuardManagementEndpoint,
 
     public boolean launch() {
         if (guardProperties.isWhetherCluster()) {
+            if (guardProperties.getClusterApplicationId() == null) {
+                throw new RuntimeException("集群的应用ID不能为空");
+            }
+            ApplicationConfig applicationConfig = guardContext.getAppConfigLoader().load(guardProperties.getClusterApplicationId());
+            if (applicationConfig.getStatus().equals(LaunchStatus.SHUTDOWN)) {
+                if (applicationConfig instanceof ConfigurableApplicationConfig) {
+                    ConfigurableApplicationConfig.class.cast(applicationConfig).setStatus(LaunchStatus.UP);
+                } else {
+                    throw new RuntimeException("启动模式为集群模式，集群的启动状态必须为UP(1)");
+                }
+            }
             launcher = new CloudLauncher(guardContext);
         } else {
+            if (guardProperties.getClusterApplicationId() != null) {
+                ApplicationConfig applicationConfig = guardContext.getAppConfigLoader().load(guardProperties.getClusterApplicationId());
+                if (applicationConfig.getStatus().equals(LaunchStatus.UP)) {
+                    if (applicationConfig instanceof ConfigurableApplicationConfig) {
+                        ConfigurableApplicationConfig.class.cast(applicationConfig).setStatus(LaunchStatus.SHUTDOWN);
+                    } else {
+                        throw new RuntimeException("启动模式为单例模式，集群的启动状态必须为SHUTDOWN(0)");
+                    }
+                }
+            }
             launcher = new SingleLauncher(guardContext);
         }
         return launcher.launch();

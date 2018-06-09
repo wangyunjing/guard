@@ -6,10 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class GuardProperties {
 
     // 是否集群模式
-    private boolean whetherCluster = true;
+    private boolean whetherCluster = false;
 
     // 集群应用的ID
-    private int clusterApplicationId = 1;
+    private Integer clusterApplicationId;
 
     // paxos实例的个数
     private int paxosInstanceNum = -1;
@@ -64,11 +64,11 @@ public class GuardProperties {
         this.paxosInstanceNum = paxosInstanceNum;
     }
 
-    public int getClusterApplicationId() {
+    public Integer getClusterApplicationId() {
         return clusterApplicationId;
     }
 
-    public void setClusterApplicationId(int clusterApplicationId) {
+    public void setClusterApplicationId(Integer clusterApplicationId) {
         this.clusterApplicationId = clusterApplicationId;
     }
 }
